@@ -115,7 +115,7 @@ class App extends PureComponent {
 				<BrowserRouter>
 					<Layout>
 						<Layout.Header style={{ backgroundColor: 'white' }} className="header">
-							<div className="logo" />
+							<div className="logo" >Si Alyaa</div>
 							<Menu
 								theme={'light'}
 								mode={'horizontal'}
@@ -125,7 +125,7 @@ class App extends PureComponent {
 									Kategori
 								</Menu.Item>
 								<Menu.Item>
-									<div className="certain-category-search-wrapper" style={{ width: 250 }}>
+									<div className="certain-category-search-wrapper">
 										<AutoComplete
 											className="certain-category-search"
 											dropdownClassName="certain-category-search-dropdown"
@@ -141,7 +141,7 @@ class App extends PureComponent {
 										</AutoComplete>
 									</div>
 								</Menu.Item>
-								<ButtonGroup>
+								<ButtonGroup style={{float: 'right'}}>
 									<Button>
 										Masuk
 									</Button>
