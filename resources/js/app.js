@@ -143,10 +143,10 @@ class App extends PureComponent {
 								</Menu.Item>
 								<ButtonGroup>
 									<Button>
-										MASUK
+										Masuk
 									</Button>
-									<Button type="primary">
-										DAFTAR
+									<Button type="primary" style={{ fontWeight: 'bold' }}>
+										Daftar
 									</Button>
 								</ButtonGroup>
 							</Menu>
