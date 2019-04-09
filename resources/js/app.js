@@ -27,6 +27,7 @@ import 'antd/dist/antd.css';  // or 'antd/dist/antd.less'
 import './app.css';
 import ButtonGroup from 'antd/lib/button/button-group';
 import ItemDetails from './components/ItemDetails';
+import LandingPage from './components/LandingPage';
 
 export const AppContext = createContext();
 
@@ -154,9 +155,10 @@ class App extends PureComponent {
 						</Layout.Header>
 						<Layout.Content style={{ padding: '0 50px', marginTop: 64 }}>
 							<Switch>
-								<Route exact path='/' component={Example} />
+								<Route exact path='/' component={LandingPage} />
 								<Route path='/create' component={Example} />
 								<Route path='/itemDetails' component={ItemDetails}/>
+								
 							</Switch>
 						</Layout.Content>
 						<Layout.Footer style={{ textAlign: 'center' }}>
