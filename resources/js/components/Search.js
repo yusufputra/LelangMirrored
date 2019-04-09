@@ -42,7 +42,7 @@ export default class Search extends React.PureComponent {
 							mode="inline"
 							defaultSelectedKeys={['1']}
 							defaultOpenKeys={['sub1']}
-							style={{ height: '100%', borderRight: 0, textAlign: 'center', padding: 8 }}
+							style={{ textAlign: 'center', padding: 8 }}
 						>
 							<Menu.Item>
 								Filter

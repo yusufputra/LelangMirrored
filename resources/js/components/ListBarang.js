@@ -3,22 +3,28 @@ import { List, Col, Pagination, Card } from 'antd';
 
 const data = [
 	{
-		title: 'Title 1',
+		title: 'Headset Gaming',
+		latestBidPrice: 1500000
 	},
 	{
-		title: 'Title 2',
+		title: 'Headset Audiophile',
+		latestBidPrice: 12000000
 	},
 	{
-		title: 'Title 3',
+		title: 'Keyboard 2nd Blue Switch',
+		latestBidPrice: 750000
 	},
 	{
-		title: 'Title 4',
+		title: 'Mouse Gaming',
+		latestBidPrice: 120000
 	},
 	{
-		title: 'Title 5',
+		title: 'Jaket Navi [LIMITED EDITION]',
+		latestBidPrice: 1800000
 	},
 	{
-		title: 'Title 6',
+		title: 'Laptop ROG i7 2018',
+		latestBidPrice: 11000000
 	},
 ];
 
@@ -52,7 +58,7 @@ export default class ListBarang extends React.PureComponent {
 							>
 								<Card.Meta
 									title={item.title}
-									description="www.instagram.com"
+									description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
 								/>
 							</Card>
 						</List.Item>
