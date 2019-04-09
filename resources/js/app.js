@@ -23,6 +23,7 @@ import { Layout, Menu, AutoComplete, Input, Button, Icon } from 'antd';
 // Import component
 import Header from './components/Header';
 import Example from './components/Example';
+import Search from './components/Search';
 import 'antd/dist/antd.css';  // or 'antd/dist/antd.less'
 import './app.css';
 import ButtonGroup from 'antd/lib/button/button-group';
@@ -155,6 +156,7 @@ class App extends PureComponent {
 							<Switch>
 								<Route exact path='/' component={Example} />
 								<Route path='/create' component={Example} />
+								<Route path='/search' component={Search} />
 							</Switch>
 						</Layout.Content>
 						<Layout.Footer style={{ textAlign: 'center' }}>
