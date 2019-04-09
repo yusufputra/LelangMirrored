@@ -44,7 +44,7 @@ class FormLogin extends React.PureComponent {
 						<a href="" >Forgot password</a>
 						</div>
 						<div style={{textAlign:'center'}}>
-						<Button type="primary" htmlType="submit"  >
+						<Button block type="primary" htmlType="submit"  >
 							Log in
 			 		 </Button>
 					  <br></br>

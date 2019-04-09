@@ -27,7 +27,7 @@ import 'antd/dist/antd.css';  // or 'antd/dist/antd.less'
 import styles from './app.css';
 import './app.css';
 import ButtonGroup from 'antd/lib/button/button-group';
-
+import Register from './components/Register';
 export const AppContext = createContext();
 
 const Option = AutoComplete.Option;
@@ -226,7 +226,7 @@ class App extends PureComponent {
 						<Layout.Content style={{ padding: '0 50px', marginTop: 64 }}>
 							<Switch>
 								<Route exact path='/' component={Example} />
-								<Route path='/create' component={Example} />
+								<Route path='/Register' component={Register} />
 							</Switch>
 						</Layout.Content>
 						<Layout.Footer style={{ textAlign: 'center' }}>
