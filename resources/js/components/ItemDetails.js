@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Layout, Row, Col, Tabs, Carousel, Comment, Avatar, Form, Button, List, Input, Table, Card, Icon, } from 'antd';
 import moment from 'moment';
 
+import './css/itemdetails.css';
 const TabPane = Tabs.TabPane;
 
 function callback(key) {
@@ -142,7 +143,7 @@ export default class ItemDetails extends Component {
           <Col xxl={20} xl={20}>
             <Row gutter={16}>
               <Col xxl={9} xl={9}>
-                <Carousel afterChange={onChange}>
+                <Carousel afterChange={onChange} autoplay>
                   <div><img src="https://imgur.com/v7bLgPg.png" /></div>
                   <div><img src="https://imgur.com/GHt0aF8.png" /></div>
                   <div><img src="https://imgur.com/f0iMfy9.png" /></div>
