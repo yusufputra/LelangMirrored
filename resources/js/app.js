@@ -28,6 +28,7 @@ import styles from './app.css';
 import './app.css';
 import ButtonGroup from 'antd/lib/button/button-group';
 import Register from './components/Register';
+import UserProfile from './components/UserProfile';
 export const AppContext = createContext();
 
 const Option = AutoComplete.Option;
@@ -227,6 +228,7 @@ class App extends PureComponent {
 							<Switch>
 								<Route exact path='/' component={Example} />
 								<Route path='/Register' component={Register} />
+								<Route path='/profile' component={UserProfile}/>
 							</Switch>
 						</Layout.Content>
 						<Layout.Footer style={{ textAlign: 'center' }}>

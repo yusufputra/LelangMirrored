@@ -41,7 +41,7 @@ class RegistrationForm extends PureComponent {
     callback();
   }
 
-  
+
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -52,13 +52,18 @@ class RegistrationForm extends PureComponent {
         xs: { span: 24 },
         sm: { span: 8 },
         md: { span: 12 },
-        lg: { span: 8 }
+        lg: { span: 10 },
+        xl: { span: 4 },
+        xxl: { span: 8 },
       },
       wrapperCol: {
         xs: { span: 24 },
         sm: { span: 16 },
         md: { span: 12 },
-        lg: { span: 16 }
+        lg: { span: 14 },
+        xl: { span: 20 },
+        xxl: { span: 16 },
+
       },
     };
     const tailFormItemLayout = {
@@ -71,15 +76,35 @@ class RegistrationForm extends PureComponent {
           span: 16,
           offset: 8,
         },
+        md: {
+          span: 16,
+          offset: 8
+        },
+        lg: {
+          span: 16,
+          offset: 8,
+        },
+        xl: {
+          span: 16,
+          offset: 8,
+        },
+        xxl: {
+          span: 20,
+          offset: 4
+        }
       },
     };
 
 
 
     return (
-      <Form {...formItemLayout} onSubmit={this.handleSubmit} style={{marginLeft:"-10px"}}>
+      <Form onSubmit={this.handleSubmit} style={{ padding: 0 }} >
         <Form.Item
-          label="E-mail"
+        colon={false}
+          label={(
+            <span style={{fontSize:20}}>Email :</span>
+          )}
+          style={{ marginBottom: '0px' }}
         >
           {getFieldDecorator('email', {
             rules: [{
@@ -92,7 +117,9 @@ class RegistrationForm extends PureComponent {
           )}
         </Form.Item>
         <Form.Item
-          label="Password"
+ label={(
+            <span style={{fontSize:20}}>Password :</span>
+          )}          style={{ marginBottom: '0px' }}
         >
           {getFieldDecorator('password', {
             rules: [{
@@ -105,7 +132,10 @@ class RegistrationForm extends PureComponent {
           )}
         </Form.Item>
         <Form.Item
-          label="Konfirmasi Password"
+ label={(
+            <span style={{fontSize:20}}>Konfirmasi Password :</span>
+          )}
+          style={{ marginBottom: '0px' }}
         >
           {getFieldDecorator('confirm', {
             rules: [{
@@ -118,14 +148,17 @@ class RegistrationForm extends PureComponent {
           )}
         </Form.Item>
         <Form.Item
+          colon={false}
           label={(
-            <span>
-              Nama Toko&nbsp;
+            
+            <span style={{fontSize:20}}>
+              Nama Toko :
               <Tooltip title="Nama toko dapat diatur kembali nanti">
                 <Icon type="question-circle-o" />
               </Tooltip>
             </span>
           )}
+          style={{ marginBottom: '0px' }}
         >
           {getFieldDecorator('nickname', {
             rules: [{ required: false, whitespace: true }],
@@ -134,10 +167,13 @@ class RegistrationForm extends PureComponent {
           )}
         </Form.Item>
         <Form.Item
-          label="Alamat"
+           label={(
+            <span style={{fontSize:20}}>Alamat :</span>
+          )}
+          style={{ marginBottom: '0px' }}
         >
           {getFieldDecorator('address', {
-            rules: [{ type: 'address', required: true, message: 'Mohon isi provinsi anda!' }],
+            rules: [{ type: 'address', required: true, message: 'Mohon isi alamat anda!' }],
           })(
             <Input placeholder={"Masukkan Alamat Anda"} >
 
@@ -145,8 +181,23 @@ class RegistrationForm extends PureComponent {
           )}
         </Form.Item>
         <Form.Item
-          label="Nomor Telepon"
-        >
+          style={{ marginBottom: '0px' }}
+          label={(
+            <span style={{fontSize:20}}>Kode Pos :</span>
+          )}        >
+          {getFieldDecorator('zipcode', {
+            rules: [{ type: 'zipcode', required: true, message: 'Mohon isi kodepos anda!' }],
+          })(
+            <Input placeholder={"Masukkan Alamat Anda"} >
+
+            </Input>
+          )}
+        </Form.Item>
+        <Form.Item
+          style={{ marginBottom: '0px' }}
+          label={(
+            <span style={{fontSize:20}}>Nomor Telepon :</span>
+          )}        >
           {getFieldDecorator('phone', {
             rules: [{ required: true, message: 'Please input your phone number!' }],
           })(
@@ -154,8 +205,10 @@ class RegistrationForm extends PureComponent {
           )}
         </Form.Item>
         <Form.Item
-          label="Tanggal Lahir"
-        >
+          style={{ marginBottom: '0px' }}
+          label={(
+            <span style={{fontSize:20}}>Tanggal Lahir :</span>
+          )}        >
           {getFieldDecorator('date-picker', {
             rules: [{ type: 'object', required: true, message: 'Please select time!' }],
           })(
@@ -163,8 +216,10 @@ class RegistrationForm extends PureComponent {
           )}
         </Form.Item>
 
-        <Form.Item {...tailFormItemLayout}>
-          <Button type="primary" htmlType="submit">Register</Button>
+        <Form.Item
+          style={{ marginBottom: '0px' }} >
+
+          <Button block type="primary" htmlType="submit">Register</Button>
         </Form.Item>
       </Form>
     );
@@ -177,15 +232,15 @@ export default class Register extends PureComponent {
   render() {
     return (
       <Row>
-        <Col md={{ span: 4 }} lg={{ span: 6 }} xl={{}}  >
+        <Col sm={{ span: 4 }} md={{ span: 6 }} lg={{ span: 6 }} xl={{ span: 8 }} xxl={{ span: 8 }} >
         </Col>
 
-        <Col md={{ span: 16 }} lg={{ span: 8 }} xl={{}}  >
-          <h3 style={{textAlign:'center'}}>Daftar akun baru sekarang</h3>
+        <Col sm={{ span: 16 }} md={{ span: 12 }} lg={{ span: 12 }} xl={{ span: 8 }} xxl={{ span: 8 }}>
+          <h3 style={{ textAlign: 'center' }}>Daftar akun baru sekarang</h3>
           <WrappedRegistrationForm />
         </Col>
 
-        <Col md={{ span: 4 }} lg={{ span: 8 }} xl={{}}  >
+        <Col sm={{ span: 4 }} md={{ span: 6 }} lg={{ span: 6 }} xl={{ span: 12 }} xxl={{ span: 12 }}>
 
 
         </Col>
