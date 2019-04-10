@@ -80,3 +80,10 @@ typings/
 
 # next.js build output
 .next
+
+# npm run watch
+public/js/app.js
+
+# OS X
+.DS_Store
+._*
