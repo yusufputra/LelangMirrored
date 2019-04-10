@@ -28,6 +28,7 @@ import './app.css';
 import ButtonGroup from 'antd/lib/button/button-group';
 import ItemDetails from './components/ItemDetails';
 import LandingPage from './components/LandingPage';
+import Checkout from './components/Checkout';
 
 export const AppContext = createContext();
 
@@ -158,6 +159,7 @@ class App extends PureComponent {
 								<Route exact path='/' component={LandingPage} />
 								<Route path='/create' component={Example} />
 								<Route path='/itemDetails' component={ItemDetails}/>
+								<Route path='/checkout' component={Checkout} />
 								
 							</Switch>
 						</Layout.Content>
