@@ -115,7 +115,7 @@ class App extends PureComponent {
 				<BrowserRouter>
 					<Layout>
 						<Layout.Header style={{ backgroundColor: 'white' }} className="header">
-							<div className="logo" >Si Alyaa</div>
+							<div className="logo" ><img src="/LelangInCropped.png" width="100%"/></div>
 							<Menu
 								theme={'light'}
 								mode={'horizontal'}
