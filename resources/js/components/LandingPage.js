@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Carousel, Layout, Row, Col, List, Card, Divider } from 'antd';
+import { Carousel, Layout, Row, Col, List, Card, Divider, Menu } from 'antd';
 
 import './css/landing.css';
 const data = [
@@ -21,74 +21,60 @@ const data = [
 	},
 ];
 export default class LandingPage extends Component {
-  render() {
-    return (
-      <Layout>
-          <Row gutter={16} style={{marginBottom: '20px'}}>
-              <Col xxl={24} xl={24} xs={24}>
-                <Carousel autoplay>
-                    <div><h3>1</h3></div>
-                    <div><h3>2</h3></div>
-                    <div><h3>3</h3></div>
-                    <div><h3>4</h3></div>
-                </Carousel>
-              </Col>
-          </Row>
-          <Col>
-            <center><h3>Barang Panas</h3></center>
-          </Col>
-          <Divider/>
-          <Row gutter={16}>
-              <Col xxl={24} xl={24} xs={24}>
-				<List
-					grid={{
-						gutter: 16, xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 5
-					}}
-					dataSource={data}
-					renderItem={item => (
-						<List.Item>
-							<Card
-								hoverable
-								cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
-							>
-								<Card.Meta
-									title={item.title}
-									description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
-								/>
-							</Card>
-						</List.Item>
-					)}
-				/>
-              </Col>
-          </Row>
-          <Col>
-            <center><h3>REKOMENDASI</h3></center>
-          </Col>
-          <Divider/>
-          <Row gutter={16}>
-              <Col xxl={24} xl={24} xs={24}>
-				<List
-					grid={{
-						gutter: 16, xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 5
-					}}
-					dataSource={data}
-					renderItem={item => (
-						<List.Item>
-							<Card
-								hoverable
-								cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
-							>
-								<Card.Meta
-									title={item.title}
-									description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
-								/>
-							</Card>
-						</List.Item>
-					)}
-				/>
-              </Col>
-          </Row>
-      </Layout>
-    )
-  }
+	render() {
+		return (
+			<Layout>
+				<Row style={{ marginBottom: '20px' }}>
+					<Carousel autoplay>
+						<div><h3>1</h3></div>
+						<div><h3>2</h3></div>
+						<div><h3>3</h3></div>
+						<div><h3>4</h3></div>
+					</Carousel>
+				</Row>
+				<Menu style={{ padding: "0 32px" }}>
+					<Divider orientation="left">Barang Panas</Divider>
+					<List
+						grid={{
+							gutter: 16, xs: 2, sm: 4, md: 4, lg: 6, xl: 6, xxl: 8
+						}}
+						dataSource={data}
+						renderItem={item => (
+							<List.Item>
+								<Card
+									hoverable
+									cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+								>
+									<Card.Meta
+										title={item.title}
+										description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
+									/>
+								</Card>
+							</List.Item>
+						)}
+					/>
+					<Divider orientation="left">Rekomendasi</Divider>
+					<List
+						grid={{
+							gutter: 16, xs: 2, sm: 4, md: 4, lg: 6, xl: 6, xxl: 8
+						}}
+						dataSource={data}
+						renderItem={item => (
+							<List.Item>
+								<Card
+									hoverable
+									cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+								>
+									<Card.Meta
+										title={item.title}
+										description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
+									/>
+								</Card>
+							</List.Item>
+						)}
+					/>
+				</Menu>
+			</Layout>
+		)
+	}
 }
