@@ -83,6 +83,7 @@ typings/
 
 # npm run watch
 public/js/app.js
+public/css/app.css
 
 # OS X
 .DS_Store
