@@ -23,6 +23,9 @@ import FormLoginComponent from './components/FormLogin';
 import ReactModal from 'react-modal';
 // Import component
 import Example from './components/Example';
+import Search from './components/Search';
+import ShopDetail from './components/ShopDetail';
+
 import 'antd/dist/antd.css';  // or 'antd/dist/antd.less'
 import styles from './app.css';
 import './app.css';
@@ -227,6 +230,9 @@ class App extends PureComponent {
 						<Layout.Content style={{ padding: '0 50px', marginTop: 64 }}>
 							<Switch>
 								<Route exact path='/' component={Example} />
+								<Route path='/create' component={Example} />
+								<Route path='/search' component={Search} />
+								<Route path='/shop' component={ShopDetail} />
 								<Route path='/Register' component={Register} />
 								<Route path='/profile' component={UserProfile}/>
 							</Switch>
