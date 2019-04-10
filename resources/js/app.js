@@ -18,15 +18,17 @@ require('./components/Example');
 import React, { PureComponent, createContext } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import { Layout, Menu, AutoComplete, Input, Button, Icon } from 'antd';
-
+import { Layout, Menu, AutoComplete, Input, Button, Icon, Col, Row } from 'antd';
+import FormLoginComponent from './components/FormLogin';
+import ReactModal from 'react-modal';
 // Import component
-import Header from './components/Header';
 import Example from './components/Example';
 import 'antd/dist/antd.css';  // or 'antd/dist/antd.less'
+import styles from './app.css';
 import './app.css';
 import ButtonGroup from 'antd/lib/button/button-group';
-
+import Register from './components/Register';
+import UserProfile from './components/UserProfile';
 export const AppContext = createContext();
 
 const Option = AutoComplete.Option;
@@ -98,15 +100,45 @@ const options = dataSource.map(group => (
 ]);
 
 class App extends PureComponent {
+	constructor(props) {
+		super(props);
+		this.state = {
+			success: true,
+			trigger: () => {
+				this.setState({ success: !this.state.success });
+			},
+			visible: false
+		};
 
-	state = {
-		success: true,
-		trigger: () => {
-			this.setState({ success: !this.state.success });
-		}
-	};
+	}
+	showModal = () => {
+		this.setState({
+			visible: true,
+		});
+	}
+
+	handleCancel = (e) => {
+
+		this.setState({
+			visible: false,
+		});
+	}
+
+	handleOk = (e) => {
+		//login process here 
+		this.setState({
+			visible: false,
+		});
+	}
+
+
+
+
 
 	render() {
+
+
+
 		return (
 			<AppContext.Provider value={this.state}>
 				{/* <AppContext.Consumer>
@@ -141,8 +173,8 @@ class App extends PureComponent {
 										</AutoComplete>
 									</div>
 								</Menu.Item>
-								<ButtonGroup style={{float: 'right'}}>
-									<Button>
+								<ButtonGroup style={{ float: 'right' }}>
+									<Button onClick={this.showModal}>
 										Masuk
 									</Button>
 									<Button type="primary" style={{ fontWeight: 'bold' }}>
@@ -150,11 +182,53 @@ class App extends PureComponent {
 									</Button>
 								</ButtonGroup>
 							</Menu>
+
 						</Layout.Header>
+
+						<ReactModal
+							isOpen={this.state.visible}
+							contentLabel="Login"
+							shouldFocusAfterRender={true}
+							shouldCloseOnOverlayClick={false}
+							shouldCloseOnEsc={true}
+							shouldReturnFocusAfterClose={true}
+							onRequestClose={this.handleCancel}
+							style={{
+								overlay: {
+									backgroundColor: 'rgba(0,0,0,0.7)'
+								},
+								content: {
+									borderRadius: '8px',
+									bottom: 'auto',
+									minHeight: '10rem',
+									left: '50%',
+									paddingTop:'0.4rem',
+									paddingLeft: '2rem',
+									paddingBottom: '2rem',
+									paddingRight: '2rem',
+									position: 'fixed',
+									right: 'auto',
+									top: '50%',
+									transform: 'translate(-50%,-50%)',
+									minWidth: '20rem',
+									width: '30%',
+									maxWidth: '30rem'
+								}
+							}
+							}
+						>
+								<a  onClick={this.handleCancel} style={{marginLeft:'100%'}}>
+									<Icon type="close-circle" style={{ fontSize: 25 }} />
+								</a>
+							<FormLoginComponent></FormLoginComponent>
+						</ReactModal>
+
+
 						<Layout.Content style={{ padding: '0 50px', marginTop: 64 }}>
 							<Switch>
 								<Route exact path='/' component={Example} />
-								<Route path='/create' component={Example} />
+								<Route path='/Register' component={Register} />
+								<Route path='/profile' component={UserProfile}/>
 							</Switch>
 						</Layout.Content>
 						<Layout.Footer style={{ textAlign: 'center' }}>
@@ -166,5 +240,6 @@ class App extends PureComponent {
 		);
 	}
 }
+
 
 ReactDOM.render(<App />, document.getElementById('app'));
