@@ -23,10 +23,16 @@ import FormLoginComponent from './components/FormLogin';
 import ReactModal from 'react-modal';
 // Import component
 import Example from './components/Example';
+import Search from './components/Search';
+import ShopDetail from './components/ShopDetail';
+
 import 'antd/dist/antd.css';  // or 'antd/dist/antd.less'
 import styles from './app.css';
 import './app.css';
 import ButtonGroup from 'antd/lib/button/button-group';
+import ItemDetails from './components/ItemDetails';
+import LandingPage from './components/LandingPage';
+import Checkout from './components/Checkout';
 import Register from './components/Register';
 import UserProfile from './components/UserProfile';
 export const AppContext = createContext();
@@ -226,9 +232,15 @@ class App extends PureComponent {
 
 						<Layout.Content style={{ padding: '0 50px', marginTop: 64 }}>
 							<Switch>
-								<Route exact path='/' component={Example} />
+								<Route exact path='/' component={LandingPage} />
+								<Route path='/create' component={Example} />
+								<Route path='/itemDetails' component={ItemDetails}/>
+								<Route path='/checkout' component={Checkout} />
+								<Route path='/search' component={Search} />
+								<Route path='/shop' component={ShopDetail} />
 								<Route path='/Register' component={Register} />
 								<Route path='/profile' component={UserProfile}/>
+
 							</Switch>
 						</Layout.Content>
 						<Layout.Footer style={{ textAlign: 'center' }}>
