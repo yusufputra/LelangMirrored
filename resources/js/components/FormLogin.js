@@ -15,8 +15,8 @@ class FormLogin extends React.PureComponent {
 
 	render() {
 		const { getFieldDecorator } = this.props.form;
-		return (
 
+		return (
 			<Form onSubmit={this.handleSubmit} className="login-form">
 				<Form.Item>
 					{getFieldDecorator('userName', {
@@ -33,22 +33,20 @@ class FormLogin extends React.PureComponent {
 					)}
 				</Form.Item>
 				<Form.Item>
-				<div style={{display:'flex',flex:1,justifyContent:'space-between'}}>
-
-					{getFieldDecorator('remember', {
-						valuePropName: 'checked',
-						initialValue: true,
-					})(
-						<Checkbox>Remember me</Checkbox>
-					)}
+					<div style={{ display: 'flex', flex: 1, justifyContent: 'space-between' }}>
+						{getFieldDecorator('remember', {
+							valuePropName: 'checked',
+							initialValue: true,
+						})(
+							<Checkbox>Remember me</Checkbox>
+						)}
 						<a href="" >Forgot password</a>
-						</div>
-						<div style={{textAlign:'center'}}>
-						<Button block type="primary" htmlType="submit"  >
+					</div>
+					<div style={{ textAlign: 'center' }}>
+						<Button block type="primary" htmlType="submit">
 							Log in
-			 		 </Button>
-					  <br></br>
-					Or <a href="">register now!</a>
+			 		 	</Button>
+						Or <a href="">register now!</a>
 					</div>
 				</Form.Item>
 			</Form>
@@ -56,8 +54,6 @@ class FormLogin extends React.PureComponent {
 	}
 }
 
-
-
 const FormLoginComponent = Form.create({ name: 'horizontal_login' })(FormLogin);
 
-export default FormLoginComponent
+export default FormLoginComponent;
