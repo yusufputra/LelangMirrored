@@ -34,4 +34,17 @@ class Pengguna extends Model
     public function notifikasi() {
         return $this->hasMany('App\Notifikasi', 'username_pengguna', 'username');
     }
+
+    public function penawaran() {
+        return $this->hasMany('App\PenawaranLelang', 'username_pengguna', 'username');
+    }
+
+    public function tokoLelang()
+    {
+        return $this->hasOne('App\TokoLelang', 'username_pengguna', 'username');
+    }
+
+    public function transaksi() {
+        return $this->hasMany('App\Transaksi', 'username_pengguna', 'username');
+    }
 }
