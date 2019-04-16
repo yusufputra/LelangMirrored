@@ -17,7 +17,7 @@ require('./components/Example');
 
 import React, { PureComponent, createContext } from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch, Link } from 'react-router-dom';
 import { Layout, Menu, AutoComplete, Input, Button, Icon, Col, Row } from 'antd';
 import FormLoginComponent from './components/FormLogin';
 import ReactModal from 'react-modal';
@@ -183,8 +183,9 @@ class App extends PureComponent {
 									<Button onClick={this.showModal}>
 										Masuk
 									</Button>
+									
 									<Button type="primary" style={{ fontWeight: 'bold' }}>
-										Daftar
+									<Link to="/Register">Daftar</Link>
 									</Button>
 								</ButtonGroup>
 							</Menu>
