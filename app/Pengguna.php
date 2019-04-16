@@ -26,4 +26,12 @@ class Pengguna extends Model
     protected $hidden = ['password'];
 
     public $timestamps = false;
+
+    public function alamatPengiriman() {
+        return $this->hasMany('App\AlamatPengiriman', 'username_pengguna', 'username');
+    }
+
+    public function notifikasi() {
+        return $this->hasMany('App\Notifikasi', 'username_pengguna', 'username');
+    }
 }
