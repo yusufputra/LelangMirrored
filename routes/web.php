@@ -17,4 +17,4 @@ use App\Http\Controllers\userController;
 // });
 
 Route::view('/{path?}', 'app');
-Route::post('/daftar', 'userController@daftar');
+
