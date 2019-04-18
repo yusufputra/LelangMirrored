@@ -5,10 +5,16 @@ namespace App\Http\Controllers;
 use App\Pengguna;
 use Illuminate\Http\Request;
 
-class userController extends Controller
+class UserController extends Controller
 {
     public function index(){
         $user = Pengguna::get();
+        return $user->toJson();
+    }
+
+    public function getOneUser($username){
+
+        $user = Pengguna::find($username);
         return $user->toJson();
     }
 

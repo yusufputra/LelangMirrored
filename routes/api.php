@@ -17,5 +17,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('/daftar', 'userController@daftar');
-Route::get('/pengguna', 'userController@index');
+Route::post('/daftar', 'UserController@daftar');
+Route::get('/pengguna', 'UserController@index');
+Route::get('/pengguna/{username}', 'UserController@getOneUser');
