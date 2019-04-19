@@ -10,7 +10,17 @@ class UserController extends Controller
 {
     public function index(){
         $user = Pengguna::get();
-        return $user->toJson();
+        if($user){
+            return response()->json([
+                'status' => true,
+                'data' => $user
+            ],200);
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => 'user not found'
+            ],404);
+        }
     }
 
     public function getOneUser($username){
@@ -20,7 +30,7 @@ class UserController extends Controller
             return response()->json([
                 'status' => true,
                 'data' => $user
-            ]);
+            ],200);
         }else{
             return response()->json([
                 'status' => false,
@@ -42,7 +52,14 @@ class UserController extends Controller
             // return $data->toJson();
             if($data){
                 if(Hash::check($validatedData['password'], $data[0]->password)){
-                    return $data->toJson();
+                    session(['username' => $data[0]->username]);
+                    session(['email' => $data[0]->email]);
+                    session(['nama' => $data[0]->nama]);
+                    session(['tanggal_lahir' => $data[0]->tanggal_lahir]);
+                    return response()->json([
+                        'status' => true,
+                        'data' => $data
+                    ],200);
                 }else{
                     return response()->json([
                         'status' => false,
