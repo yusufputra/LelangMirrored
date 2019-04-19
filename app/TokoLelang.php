@@ -18,12 +18,15 @@ class TokoLelang extends Model
         'kode_pos',
     ];
 
+    public $timestamps = false;
+
     public function pengguna()
     {
         return $this->belongsTo('App\User', 'username_pengguna', 'username');
     }
 
-    public function barang() {
+    public function barang()
+    {
         return $this->hasMany('App\BarangLelang', 'id_toko', 'id');
     }
 }

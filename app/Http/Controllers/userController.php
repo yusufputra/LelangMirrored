@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Pengguna;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -19,20 +20,44 @@ class UserController extends Controller
     }
 
     public function login(Request $request){
-        $validatedData = $request->validate([
-            'username' => 'required',
-            'email' => 'required',
-            'password' => 'required'
-        ]);
-        $data = Pengguna::where('username', $validatedData['username']);
-        if($data){
-            if(Hash::check($validatedData['password'], $data->password)){
-                return $data->toJson();
+
+        try{
+            $validatedData = $request->validate([
+                'username' => 'max:32',
+                'email' => 'max:255',
+                'password' => 'required'
+            ]);
+            $data = Pengguna::where('username', $validatedData['username'])
+                    ->get();
+            // return $data->toJson();
+            if($data){
+                if(Hash::check($validatedData['password'], $data[0]->password)){
+                    return $data->toJson();
+                }else{
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Email atau Username atau Password salah'
+                    ],404);
+                }
             }else{
-                return $data->toJson('Email atau Username atau Password salah');
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Email atau Username atau Password salah'
+                ],404);
             }
-        }else{
-            return $data->toJson('Email atau Username atau Password salah');
+        }catch(\Exception $e){
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
         }
     }
 

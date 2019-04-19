@@ -27,6 +27,19 @@ class Pengguna extends Model
 
     public $timestamps = false;
 
+    public function toArray()
+    {
+        // Only hide email if `guest` or not an `admin`
+        $this->setAttributeVisibility();
+
+        return parent::toArray();
+    }
+
+    public function setAttributeVisibility()
+    {
+        $this->makeVisible(array_merge($this->fillable, $this->appends, ['password']));
+    }
+
     public function alamatPengiriman() {
         return $this->hasMany('App\AlamatPengiriman', 'username_pengguna', 'username');
     }
