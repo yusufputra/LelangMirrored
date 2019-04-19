@@ -20,7 +20,7 @@ Route::post('login', 'UserController@login');
 Route::post('daftar', 'UserController@daftar');
 Route::get('pengguna', 'UserController@index');
 Route::get('pengguna/{username}', 'UserController@getOneUser');
-
+Route::post('updateProfile', 'UserController@updateProfile');
 
 // ShopController
 Route::post('/daftarToko', 'ShopController@createShop');
