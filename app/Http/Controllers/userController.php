@@ -49,7 +49,7 @@ class UserController extends Controller
             ]);
             $data = Pengguna::where('username', $validatedData['username'])
                     ->get();
-            // return $data->toJson();
+            return $data->toJson();
             if($data){
                 if(Hash::check($validatedData['password'], $data[0]->password)){
                     session(['username' => $data[0]->username]);
