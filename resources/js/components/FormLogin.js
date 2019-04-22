@@ -1,55 +1,96 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import {
-	Form, Icon, Input, Button, Checkbox,
+	Form, Icon, Input, Button, Checkbox, Alert
 } from 'antd';
+import axios from 'axios';
 import './form.css';
+import api from './api';
 class FormLogin extends React.PureComponent {
+	state = {
+		status: false
+	}
 	handleSubmit = (e) => {
 		e.preventDefault();
-		this.props.form.validateFields((err, values) => {
+		this.props.form.validateFields(async (err, values) => {
 			if (!err) {
 				console.log('Received values of form: ', values);
+				// try catch method using async await
+				try {
+					const status = await axios.post(api.login, {
+
+
+						username: values.userName,
+						password: values.password
+					});
+					console.log(status.data);
+				}
+				catch (err) {
+					console.log('error');
+					console.log(err);
+					this.setState({ status: true })
+				}
+				// axios.post('/api/login', {
+
+
+				// 	username: values.userName,
+				// 	password: values.password
+				// }).then(status => {
+				// 	console.log(status);
+				// })
+				// 	.catch(err => {
+				// 		console.log('error');
+				// 		console.log(err);
+				// 	})
 			}
 		});
 	}
 
+
+
 	render() {
 		const { getFieldDecorator } = this.props.form;
-
+		console.log(this.state.status);
 		return (
-			<Form onSubmit={this.handleSubmit} className="login-form">
-				<Form.Item>
-					{getFieldDecorator('userName', {
-						rules: [{ required: true, message: 'Please input your username!' }],
-					})(
-						<Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
-					)}
-				</Form.Item>
-				<Form.Item>
-					{getFieldDecorator('password', {
-						rules: [{ required: true, message: 'Please input your Password!' }],
-					})(
-						<Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
-					)}
-				</Form.Item>
-				<Form.Item>
-					<div style={{ display: 'flex', flex: 1, justifyContent: 'space-between' }}>
-						{getFieldDecorator('remember', {
-							valuePropName: 'checked',
-							initialValue: true,
+			<Fragment>
+				{this.state.status && <Alert message="Login Gagal " type="error" />}
+
+
+
+
+				<Form onSubmit={this.handleSubmit} className="login-form">
+					<Form.Item>
+						{getFieldDecorator('userName', {
+							rules: [{ required: true, message: 'Please input your username!' }],
 						})(
-							<Checkbox>Remember me</Checkbox>
+							<Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
 						)}
-						<a href="" >Forgot password</a>
-					</div>
-					<div style={{ textAlign: 'center' }}>
-						<Button block type="primary" htmlType="submit">
-							Log in
+					</Form.Item>
+					<Form.Item>
+						{getFieldDecorator('password', {
+							rules: [{ required: true, message: 'Please input your Password!' }],
+						})(
+							<Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
+						)}
+					</Form.Item>
+					<Form.Item>
+						<div style={{ display: 'flex', flex: 1, justifyContent: 'space-between' }}>
+							{getFieldDecorator('remember', {
+								valuePropName: 'checked',
+								initialValue: true,
+							})(
+								<Checkbox>Remember me</Checkbox>
+							)}
+							<a href="" >Forgot password</a>
+						</div>
+						<div style={{ textAlign: 'center' }}>
+							<Button block type="primary" htmlType="submit">
+								Log in
 			 		 	</Button>
-						Or <a href="">register now!</a>
-					</div>
-				</Form.Item>
-			</Form>
+							Or <a href="">register now!</a>
+						</div>
+					</Form.Item>
+				</Form>
+			</Fragment>
 		);
 	}
 }

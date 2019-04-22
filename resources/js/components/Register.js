@@ -1,20 +1,40 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import {
-  Form, Input, Tooltip, Icon, DatePicker, Select, Row, Col, Checkbox, Button, AutoComplete, Menu
+  Form, Input, Tooltip, Icon, DatePicker, Select, Row, Col, Checkbox, Button, AutoComplete, Menu, Alert
 } from 'antd';
+import api from './api';
 
 
 class RegistrationForm extends PureComponent {
   state = {
     confirmDirty: false,
     autoCompleteResult: [],
+    datePicker: null,
+    status: false
   };
 
   handleSubmit = (e) => {
     e.preventDefault();
-    this.props.form.validateFieldsAndScroll((err, values) => {
+    this.props.form.validateFieldsAndScroll(async (err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
+        const body = {
+          username: values.username,
+          email: values.email,
+          nama: values.name,
+          password: values.password,
+          tanggal_lahir: this.state.datePicker
+        }
+        console.log(body);
+        try {
+          const status = await axios.post(api.register, body);
+          console.log(status.data);
+        }
+        catch (err) {
+          console.log('error');
+          console.log(err);
+          this.setState({ status: true });
+        }
       }
     });
   }
@@ -42,62 +62,101 @@ class RegistrationForm extends PureComponent {
   }
 
   render() {
+
+
+
     const { getFieldDecorator } = this.props.form;
-    const { autoCompleteResult } = this.state;
 
     return (
-      <Form onSubmit={this.handleSubmit} style={{ padding: 0 }} >
-        <Form.Item
-          colon={false}
-          label={(
-            <span style={{ fontSize: 20 }}>Email :</span>
-          )}
-          style={{ marginBottom: '0px', paddingBottom: '0px' }}
-        >
-          {getFieldDecorator('email', {
-            rules: [{
-              type: 'email', message: 'Pastikan email Valid',
-            }, {
-              required: true, message: 'Masukkan Email Anda',
-            }],
-          })(
-            <Input />
-          )}
-        </Form.Item>
-        <Form.Item
-          colon={false}
-          label={(
-            <span style={{ fontSize: 20 }}>Password :</span>
-          )} style={{ marginBottom: '0px' }}
-        >
-          {getFieldDecorator('password', {
-            rules: [{
-              required: true, message: 'Masukkan password!',
-            }, {
-              validator: this.validateToNextPassword,
-            }],
-          })(
-            <Input type="password" />
-          )}
-        </Form.Item>
-        <Form.Item
-          colon={false}
-          label={(
-            <span style={{ fontSize: 20 }}>Konfirmasi Password :</span>
-          )}
-          style={{ marginBottom: '0px' }}
-        >
-          {getFieldDecorator('confirm', {
-            rules: [{
-              required: true, message: 'pastikan password sama!',
-            }, {
-              validator: this.compareToFirstPassword,
-            }],
-          })(
-            <Input type="password" onBlur={this.handleConfirmBlur} />
-          )}
-        </Form.Item>
-        <Form.Item
+      <Fragment>
+        {this.state.status && <Alert message="Register Gagal " type="error" />}
+
+        <Form onSubmit={this.handleSubmit} style={{ padding: 0 }} >
+          <Form.Item
+            colon={false}
+            label={(
+              <span style={{ fontSize: 20 }}>Email :</span>
+            )}
+            style={{ marginBottom: '0px', paddingBottom: '0px' }}
+          >
+            {getFieldDecorator('email', {
+              rules: [{
+                type: 'email', message: 'Pastikan email Valid',
+              }, {
+                required: true, message: 'Masukkan Email Anda',
+              }],
+            })(
+              <Input />
+            )}
+          </Form.Item>
+          <Form.Item
+            colon={false}
+            label={(
+              <span style={{ fontSize: 20 }}>Username :</span>
+            )}
+            style={{ marginBottom: '0px', paddingBottom: '0px' }}
+          >
+            {getFieldDecorator('username', {
+              rules: [{
+                type: 'string', message: 'Pastikan username Valid',
+              }, {
+                required: true, message: 'Masukkan username Anda',
+              }],
+            })(
+              <Input />
+            )}
+          </Form.Item>
+          <Form.Item
+            colon={false}
+            label={(
+              <span style={{ fontSize: 20 }}>Nama :</span>
+            )}
+            style={{ marginBottom: '0px', paddingBottom: '0px' }}
+          >
+            {getFieldDecorator('name', {
+              rules: [{
+                type: 'string', message: 'Pastikan nama Valid',
+              }, {
+                required: true, message: 'Masukkan nama Anda',
+              }],
+            })(
+              <Input />
+            )}
+          </Form.Item>
+          <Form.Item
+            colon={false}
+            label={(
+              <span style={{ fontSize: 20 }}>Password :</span>
+            )} style={{ marginBottom: '0px' }}
+          >
+            {getFieldDecorator('password', {
+              rules: [{
+                required: true, message: 'Masukkan password!',
+              }, {
+                validator: this.validateToNextPassword,
+              }],
+            })(
+              <Input type="password" />
+            )}
+          </Form.Item>
+          <Form.Item
+            colon={false}
+            label={(
+              <span style={{ fontSize: 20 }}>Konfirmasi Password :</span>
+            )}
+            style={{ marginBottom: '0px' }}
+          >
+            {getFieldDecorator('confirm', {
+              rules: [{
+                required: true, message: 'pastikan password sama!',
+              }, {
+                validator: this.compareToFirstPassword,
+              }],
+            })(
+              <Input type="password" onBlur={this.handleConfirmBlur} />
+            )}
+          </Form.Item>
+          {/* <Form.Item
           colon={false}
           label={(
             <span style={{ fontSize: 20 }}>
@@ -114,8 +173,8 @@ class RegistrationForm extends PureComponent {
           })(
             <Input />
           )}
-        </Form.Item>
-        <Form.Item
+        </Form.Item> */}
+          {/* <Form.Item
           colon={false}
           label={(
             <span style={{ fontSize: 20 }}>Alamat :</span>
@@ -123,21 +182,21 @@ class RegistrationForm extends PureComponent {
           style={{ marginBottom: '0px' }}
         >
           {getFieldDecorator('address', {
-            rules: [{ type: 'address', required: true, message: 'Mohon isi alamat anda!' }],
+            rules: [{ type: 'string', required: true, message: 'Mohon isi alamat anda!' }],
           })(
             <Input placeholder={"Masukkan Alamat Anda"} >
 
             </Input>
           )}
-        </Form.Item>
-        <Form.Item
+        </Form.Item> */}
+          {/* <Form.Item
           colon={false}
           style={{ marginBottom: '0px' }}
           label={(
             <span style={{ fontSize: 20 }}>Kode Pos :</span>
           )}        >
           {getFieldDecorator('zipcode', {
-            rules: [{ type: 'zipcode', required: true, message: 'Mohon isi kodepos anda!' }],
+            rules: [{ type: 'string', required: true, message: 'Mohon isi kodepos anda!' }],
           })(
             <Input placeholder={"Masukkan Alamat Anda"} >
 
@@ -155,25 +214,26 @@ class RegistrationForm extends PureComponent {
           })(
             <Input addonBefore={"+62"} style={{ width: '100%' }} />
           )}
-        </Form.Item>
-        <Form.Item
-          colon={false}
-          style={{ marginBottom: '0px' }}
-          label={(
-            <span style={{ fontSize: 20 }}>Tanggal Lahir :</span>
-          )}        >
-          {getFieldDecorator('date-picker', {
-            rules: [{ type: 'object', required: true, message: 'Please select time!' }],
-          })(
-            <DatePicker />
-          )}
-        </Form.Item>
+        </Form.Item> */}
+          <Form.Item
+            colon={false}
+            style={{ marginBottom: '0px' }}
+            label={(
+              <span style={{ fontSize: 20 }}>Tanggal Lahir :</span>
+            )}        >
+            {getFieldDecorator('date-picker', {
+              rules: [{ type: 'object', required: true, message: 'Please select time!' }],
+            })(
+              <DatePicker onChange={(date, dateString) => this.setState({ datePicker: dateString })} />
+            )}
+          </Form.Item>
 
-        <Form.Item
-          style={{ marginBottom: '0px' }} >
-          <Button block type="primary" htmlType="submit">Register</Button>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            style={{ marginBottom: '0px' }} >
+            <Button block type="primary" htmlType="submit">Register</Button>
+          </Form.Item>
+        </Form>
+      </Fragment>
     );
   }
 }
@@ -183,7 +243,7 @@ const WrappedRegistrationForm = Form.create({ name: 'register' })(RegistrationFo
 export default class Register extends PureComponent {
   render() {
     return (
-      <Menu style={{ width: '40%', margin: 'auto', padding: 16 }}>
+      <Menu style={{ width: '40%', margin: 'auto', padding: 16, borderRadius: 10 }}>
         <h3 style={{ textAlign: 'center' }}>Daftar akun baru sekarang</h3>
         <WrappedRegistrationForm />
       </Menu>

@@ -35,6 +35,8 @@ import LandingPage from './components/LandingPage';
 import Checkout from './components/Checkout';
 import Register from './components/Register';
 import UserProfile from './components/UserProfile';
+import CreateShop from './components/CreateShop';
+import CreateLelang from './components/CreateLelang';
 export const AppContext = createContext();
 
 const Option = AutoComplete.Option;
@@ -241,7 +243,8 @@ class App extends PureComponent {
 								<Route path='/shop' component={ShopDetail} />
 								<Route path='/Register' component={Register} />
 								<Route path='/profile' component={UserProfile}/>
-
+								<Route path='/createShop' component={CreateShop}/>
+								<Route path='/createLelang' component={CreateLelang}/>
 							</Switch>
 						</Layout.Content>
 						<Layout.Footer style={{ textAlign: 'center' }}>
