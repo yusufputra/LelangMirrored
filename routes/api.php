@@ -21,7 +21,6 @@ Route::post('daftar', 'UserController@daftar');
 Route::get('pengguna', 'UserController@index');
 Route::get('pengguna/{username}', 'UserController@getOneUser');
 Route::post('updateProfile', 'UserController@updateProfile');
-Route::get('getEnv', 'UserController@getEnv');
 
 // ShopController
 Route::post('/daftarToko', 'ShopController@createShop');
