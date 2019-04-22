@@ -23,6 +23,9 @@ class UserController extends Controller
         }
     }
 
+    public function getEnv(){
+        return response()->json($_ENV['SECRET_TOKEN']);
+    }
     public function getOneUser($username){
 
         $user = Pengguna::find($username);
