@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AlamatPengiriman;
 use App\Pengguna;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
@@ -66,7 +67,7 @@ class UserController extends Controller
             $data = Pengguna::where('username', $validatedData['username'])->first();
             if ($data) {
                 if (Hash::check($validatedData['password'], $data->password)) {
-					$jwt = $this->jwt($data);
+                    $jwt = $this->jwt($data);
 
                     return response()->json([
                         'status' => true,
@@ -111,7 +112,7 @@ class UserController extends Controller
                 'tanggal_lahir' => 'required',
             ]);
 
-            $project = Pengguna::create([
+            $pengguna = Pengguna::create([
                 'username' => $validatedData['username'],
                 'email' => $validatedData['email'],
                 'nama' => $validatedData['nama'],
@@ -119,15 +120,15 @@ class UserController extends Controller
                 'tanggal_lahir' => $validatedData['tanggal_lahir'],
             ]);
 
-            if ($project) {
+            if ($pengguna) {
                 return response()->json([
                     'status' => true,
-                    'message' => 'register successed',
+                    'message' => 'Registrasi berhasil',
                 ], 200);
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'register failed',
+                    'message' => 'Registrasi gagal',
                 ], 400);
             }
         } catch (\Exception $e) {
