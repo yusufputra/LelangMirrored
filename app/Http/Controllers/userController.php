@@ -12,17 +12,32 @@ class UserController extends Controller
 {
     public function index()
     {
-        $user = Pengguna::get();
-        if ($user) {
-            return response()->json([
-                'status' => true,
-                'data' => $user,
-            ], 200);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Pengguna tidak ditemukan',
-            ], 404);
+        try {
+            $user = Pengguna::get();
+            if ($user) {
+                return response()->json([
+                    'status' => true,
+                    'data' => $user,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pengguna tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
         }
     }
 
@@ -37,22 +52,37 @@ class UserController extends Controller
 
         // As you can see we are passing `JWT_SECRET` as the second parameter that will
         // be used to decode the token in the future.
-        return JWT::encode($payload, env('SECRET_TOKEN_KEY'));
+        return JWT::encode($payload, env('SECRET_TOKEN_KEY'),'HS256');
     }
 
     public function getOneUser($username)
     {
-        $user = Pengguna::find($username);
-        if ($user) {
-            return response()->json([
-                'status' => true,
-                'data' => $user,
-            ], 200);
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Pengguna tidak ditemukan',
-            ], 404);
+        try {
+            $user = Pengguna::find($username);
+            if ($user) {
+                return response()->json([
+                    'status' => true,
+                    'data' => $user,
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pengguna tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
         }
     }
 
