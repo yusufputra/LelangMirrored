@@ -32,4 +32,7 @@ Route::group(['middleware'=>['checkjwt']],function(){
     Route::post('/updateProfile', 'UserController@updateProfile');
     Route::post('/ubahInformasiToko', 'ShopController@updateShop');
     Route::post('/hapusToko', 'ShopController@deleteShop');
+    Route::group(['middleware' => ['checktoko']], function () {
+        Route::post('/mulailelang','AuctionController@createAuction');
+    });
 });

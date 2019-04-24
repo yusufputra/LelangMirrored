@@ -20,6 +20,8 @@ class CheckJwt
 
         try{
             $user = JWT::decode($request->header('authorization'),env('SECRET_TOKEN_KEY'),['HS256']);
+            $request->user = $user;
+            // return response()->json($request->user);
         }catch(\Exception $e){
             return response()->json("Unauthorized",401);
         }
