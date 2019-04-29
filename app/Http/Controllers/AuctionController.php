@@ -196,4 +196,39 @@ class AuctionController extends Controller
             return response()->json($errorData, $e->status ?? 500);
         }
     }
+
+    public function searchAuction(Request $request)
+    {
+        try {
+            $barang = BarangLelang::whereRaw("1 = 1");
+
+            // if ($request['keyword']) {
+            //     $barang->where('nama_barang', 'LIKE', '%' . $request['keyword'] . '%');
+            // }
+
+            // if ($request['max_price']) {
+			// 	$barang->where('');
+            // }
+
+            $barang = $barang->get()->all();
+
+            return response()->json([
+                'status' => true,
+                'data' => $barang,
+            ], 200);
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
+        }
+    }
 }
