@@ -23,9 +23,9 @@ class TokoLelang extends Model
 	
 	protected $appends = ['foto'];
 
-    public function pengguna()
+    public function pemilik()
     {
-        return $this->belongsTo('App\User', 'username_pengguna', 'username');
+        return $this->belongsTo('App\Pengguna', 'username_pengguna', 'username');
     }
 
     public function barang()

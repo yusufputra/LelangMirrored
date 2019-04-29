@@ -70,7 +70,6 @@ class ShopController extends Controller
                 return response()->json([
                     'status' => true,
 					'data' => $tokoLelang,
-					'pengguna' => $tokoLelang->pengguna
                 ]);
             } else {
                 return response()->json([
