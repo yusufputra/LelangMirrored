@@ -7,7 +7,8 @@ import './form.css';
 import api from './api';
 class FormLogin extends React.PureComponent {
 	state = {
-		status: false
+		status: false,
+		loading:false,
 	}
 	handleSubmit = (e) => {
 		e.preventDefault();
@@ -15,6 +16,7 @@ class FormLogin extends React.PureComponent {
 			if (!err) {
 				console.log('Received values of form: ', values);
 				// try catch method using async await
+				this.setState({loading:true})
 				try {
 					const status = await axios.post(api.login, {
 
@@ -22,12 +24,14 @@ class FormLogin extends React.PureComponent {
 						username: values.userName,
 						password: values.password
 					});
-					console.log(status.data);
+					this.setState({loading:false});
+					localStorage.token = values.data.token
 				}
 				catch (err) {
 					console.log('error');
 					console.log(err);
-					this.setState({ status: true })
+					this.setState({loading:false});
+					this.setState({ status: true });
 				}
 				// axios.post('/api/login', {
 
@@ -83,7 +87,7 @@ class FormLogin extends React.PureComponent {
 							<a href="" >Forgot password</a>
 						</div>
 						<div style={{ textAlign: 'center' }}>
-							<Button block type="primary" htmlType="submit">
+							<Button block type="primary" htmlType="submit" loading={this.state.loading}>
 								Log in
 			 		 	</Button>
 							Or <a href="">register now!</a>
