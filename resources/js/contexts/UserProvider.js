@@ -14,6 +14,9 @@ export default class UserProvider extends PureComponent {
 			if(localStorage.token){
 				this.state.loggedIn=true;
 			}
+			else {
+				this.state.loggedIn=false;
+			}
 		}
 
 		

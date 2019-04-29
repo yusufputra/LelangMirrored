@@ -138,7 +138,7 @@ class AppChildren extends PureComponent {
 
 
 	componentWillMount() {
-		this.props.context.setLoggedIn();
+		this.props.context.checkLogin();
 	}
 
 	showModal = () => {
