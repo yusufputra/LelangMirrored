@@ -133,7 +133,7 @@ class UserController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'username' => 'required',
+                'username' => 'required|alpha_dash',
                 'email' => 'required',
                 'nama' => 'required',
                 'password' => 'required',
@@ -179,7 +179,7 @@ class UserController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'username' => 'required',
+                'username' => 'required|alpha_dash',
                 'email' => 'required',
                 'nama' => 'required',
                 'password' => 'required',
@@ -219,5 +219,31 @@ class UserController extends Controller
             }
             return response()->json($e->getMessage(), $e->status ?? 500);
         }
+    }
+
+    public function uploadPhoto(Request $request)
+    {
+        if ($request->hasFile('photo')) {
+            $photo = $request->file('photo');
+            if ($photo->isValid()) {
+                if (stripos($photo->getMimeType(), 'image') !== false) {
+                    $photo->move(public_path() . '/uploads/profile_photo/',
+                        $request->user->username . '.' . $photo->getClientOriginalExtension());
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Foto profil berhasil diperbarui',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Format berkas tidak sesuai',
+                    ], 400);
+                }
+            }
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'Pengunggahan foto gagal',
+        ], 400);
     }
 }

@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
 
 class TokoLelang extends Model
 {
@@ -18,7 +19,9 @@ class TokoLelang extends Model
         'kode_pos',
     ];
 
-    public $timestamps = false;
+	public $timestamps = false;
+	
+	protected $appends = ['foto'];
 
     public function pengguna()
     {
@@ -28,5 +31,19 @@ class TokoLelang extends Model
     public function barang()
     {
         return $this->hasMany('App\BarangLelang', 'id_toko', 'id');
+	}
+	
+	public function getFotoAttribute()
+    {
+
+        $standardPhotoPath = '/uploads/shop_photo/';
+        $path = public_path() . $standardPhotoPath . $this->attributes['username_pengguna'];
+        $matchingFiles = File::glob("{$path}.*");
+        if ($matchingFiles) {
+            $photo_name = explode('/', $matchingFiles[0]);
+            return url($standardPhotoPath . end($photo_name));
+        } else {
+            return 'http://www.stickpng.com/assets/images/585e4bf3cb11b227491c339a.png';
+        }
     }
 }
