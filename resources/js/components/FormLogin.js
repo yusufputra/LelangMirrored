@@ -19,13 +19,12 @@ class FormLogin extends React.PureComponent {
 				this.setState({loading:true})
 				try {
 					const status = await axios.post(api.login, {
-
-
 						username: values.userName,
 						password: values.password
 					});
 					this.setState({loading:false});
-					localStorage.token = values.data.token
+					localStorage.token=status.data.token;
+					window.location.reload();
 				}
 				catch (err) {
 					console.log('error');
