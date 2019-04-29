@@ -37,6 +37,8 @@ import Register from './components/Register';
 import UserProfile from './components/UserProfile';
 import CreateShop from './components/CreateShop';
 import CreateLelang from './components/CreateLelang';
+
+import UserProvider, { UserContext } from './contexts/UserProvider';
 export const AppContext = createContext();
 
 const Option = AutoComplete.Option;
@@ -107,7 +109,18 @@ const options = dataSource.map(group => (
 	</Option>,
 ]);
 
-class App extends PureComponent {
+function App() {
+	return (
+		<UserProvider>
+			<UserContext.Consumer>
+				{(context) => <AppChildren context={context} />}
+			</UserContext.Consumer>
+		</UserProvider>
+	);
+}
+
+class AppChildren extends PureComponent {
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -117,8 +130,12 @@ class App extends PureComponent {
 			},
 			visible: false
 		};
-
 	}
+
+	componentWillMount() {
+		console.log(this.props.context);
+	}
+
 	showModal = () => {
 		this.setState({
 			visible: true,
@@ -126,26 +143,21 @@ class App extends PureComponent {
 	}
 
 	handleCancel = (e) => {
-
 		this.setState({
 			visible: false,
 		});
 	}
 
 	handleOk = (e) => {
-		//login process here 
+		//login process here
 		this.setState({
 			visible: false,
 		});
 	}
 
-
-
-
-
 	render() {
 
-
+		console.log(this.props.context);
 
 		return (
 			<AppContext.Provider value={this.state}>
@@ -155,7 +167,7 @@ class App extends PureComponent {
 				<BrowserRouter>
 					<Layout>
 						<Layout.Header style={{ backgroundColor: 'white' }} className="header">
-							<div className="logo" ><img src="/LelangInCropped.png" width="100%"/></div>
+							<div className="logo" ><img src="/LelangInCropped.png" width="100%" /></div>
 							<Menu
 								theme={'light'}
 								mode={'horizontal'}
@@ -184,10 +196,9 @@ class App extends PureComponent {
 								<ButtonGroup style={{ float: 'right' }}>
 									<Button onClick={this.showModal}>
 										Masuk
-									</Button>
-									
+										</Button>
 									<Button type="primary" style={{ fontWeight: 'bold' }}>
-									<Link to="/Register">Daftar</Link>
+										<Link to="/Register">Daftar</Link>
 									</Button>
 								</ButtonGroup>
 							</Menu>
@@ -211,7 +222,7 @@ class App extends PureComponent {
 									bottom: 'auto',
 									minHeight: '10rem',
 									left: '50%',
-									paddingTop:'0.4rem',
+									paddingTop: '0.4rem',
 									paddingLeft: '2rem',
 									paddingBottom: '2rem',
 									paddingRight: '2rem',
@@ -223,28 +234,26 @@ class App extends PureComponent {
 									width: '30%',
 									maxWidth: '30rem'
 								}
-							}
-							}
+							}}
 						>
-								<a  onClick={this.handleCancel} style={{marginLeft:'100%'}}>
-									<Icon type="close-circle" style={{ fontSize: 25 }} />
-								</a>
+							<a onClick={this.handleCancel} style={{ marginLeft: '100%' }}>
+								<Icon type="close-circle" style={{ fontSize: 25 }} />
+							</a>
 							<FormLoginComponent></FormLoginComponent>
 						</ReactModal>
-
 
 						<Layout.Content style={{ padding: '0 50px', marginTop: 64 }}>
 							<Switch>
 								<Route exact path='/' component={LandingPage} />
 								<Route path='/create' component={Example} />
-								<Route path='/itemDetails' component={ItemDetails}/>
+								<Route path='/itemDetails' component={ItemDetails} />
 								<Route path='/checkout' component={Checkout} />
 								<Route path='/search' component={Search} />
 								<Route path='/shop' component={ShopDetail} />
 								<Route path='/Register' component={Register} />
-								<Route path='/profile' component={UserProfile}/>
-								<Route path='/createShop' component={CreateShop}/>
-								<Route path='/createLelang' component={CreateLelang}/>
+								<Route path='/profile' component={UserProfile} />
+								<Route path='/createShop' component={CreateShop} />
+								<Route path='/createLelang' component={CreateLelang} />
 							</Switch>
 						</Layout.Content>
 						<Layout.Footer style={{ textAlign: 'center' }}>
