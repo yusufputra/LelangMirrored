@@ -137,8 +137,8 @@ class AppChildren extends PureComponent {
 	}
 
 
-	componentWillMount() {
-		this.props.context.checkLogin();
+	componentWillMount = async () => {
+		await this.props.context.checkLogin();
 	}
 
 	showModal = () => {
@@ -160,6 +160,7 @@ class AppChildren extends PureComponent {
 		});
 	}
 	popOver() {
+		
 		return (
 			<Fragment>
 				<a >
@@ -175,6 +176,7 @@ class AppChildren extends PureComponent {
 	}
 
 	renderButton() {
+		console.log(this.props.context);
 		if (this.props.context.loggedIn) {
 			return (
 				<ButtonGroup style={{ float: 'right' }}>
