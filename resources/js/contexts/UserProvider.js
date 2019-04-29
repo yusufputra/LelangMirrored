@@ -9,7 +9,14 @@ export default class UserProvider extends PureComponent {
 		setLoggedIn: () => {
 			this.state.loggedIn = true;
 			this.forceUpdate();
+		},
+		checkLogin :()=>{
+			if(localStorage.token){
+				this.state.loggedIn=true;
+			}
 		}
+
+		
 	}
 
 	render() {
