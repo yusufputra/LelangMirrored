@@ -14,7 +14,9 @@ class PenawaranLelang extends Model
         'id_barang',
         'harga_penawaran',
         'created_at'
-    ];
+	];
+	
+    public $timestamps = false;
 
     public function pengguna()
     {

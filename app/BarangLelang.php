@@ -37,17 +37,6 @@ class BarangLelang extends Model
         return $max;
     }
 
-    public function getMinBidAttribute()
-    {
-        $min = 0;
-        foreach ($this->penawaran as $p) {
-            if ($p->harga_penawaran < $min) {
-                $min = $p->harga_penawaran;
-            }
-        }
-        return $min;
-    }
-
     public function toko()
     {
         return $this->belongsTo('App\TokoLelang', 'id_toko', 'id');

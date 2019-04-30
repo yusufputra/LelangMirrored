@@ -31,7 +31,9 @@ Route::group(['middleware' => ['checkjwt']], function () {
     Route::post('perbarui-profil', 'UserController@updateProfile');
     Route::post('unggah-foto-profil', 'UserController@uploadPhoto');
 
-    Route::post('daftar-toko', 'ShopController@createShop');
+	Route::post('daftar-toko', 'ShopController@createShop');
+	
+	Route::post('penawaran-lelang/{id}', 'AuctionController@placeBid');
 
     Route::group(['middleware' => ['checktoko']], function () {
 		// ShopController

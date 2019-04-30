@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\BarangLelang;
+use App\PenawaranLelang;
 use Illuminate\Http\Request;
 
 class AuctionController extends Controller
@@ -212,22 +213,56 @@ class AuctionController extends Controller
                 $barang->where('nama_barang', 'LIKE', '%' . $request->get('keyword') . '%');
             }
 
-            // if ($request->get('max')) {
-            //     $barang->where('max_bid', '<=', $request->get('max'));
+            $barang = $barang->get();
+
+            if ($request->get('max')) {
+                $barang = $barang->filter(function ($element) use ($request) {
+                    return $element->max_bid <= $request->get('max');
+                });
+            }
+
+            if ($request->get('min')) {
+                $barang = $barang->filter(function ($element) use ($request) {
+                    return $element->max_bid >= $request->get('max');
+                });
+            }
+
+            // if ($request->get('sortBy')) {
+            //     switch ($request->get('sortBy')) {
+            //         case 'name':
+            //             $barang->sortBy('nama_barang');
+            //             break;
+            //         case 'nameDesc':
+            //             $barang->sortByDesc('nama_barang');
+            //             break;
+            //         case 'price':
+            //             $barang->sortBy('max_bid');
+            //             break;
+            //         case 'priceDesc':
+            //             $barang->sortByDesc('max_bid');
+            //             break;
+            //         case 'latestDesc':
+            //             $barang->sortByDesc('id');
+            //             break;
+            //         default:
+            //             $barang->sortBy('id');
+            //             break;
+            //     }
             // }
 
-			$barang = $barang->get();
-			
-			// error_log(gettype($barang->toArray()));
-			// foreach($barang as $b) {
-			// 	error_log($b->nama_barang);
-			// }
+            if ($request->get('perPage')) {
+                $temp = $barang;
+                $barang = array();
 
-            // if ($request->get('max')) {
-            //     array_filter($barang, function ($element) {
-            //         return $element->max_bid <= $request->get('max');
-            //     });
-            // }
+                $page = $request->get('page') ?? 1;
+                for ($i = ($page - 1) * $request->get('perPage'); $i < $page * $request->get('perPage'); $i++) {
+                    if (isset($temp[$i])) {
+                        $barang[] = $temp[$i];
+                    } else {
+                        break;
+                    }
+                }
+            }
 
             return response()->json([
                 'status' => true,
@@ -246,6 +281,71 @@ class AuctionController extends Controller
                 $errorData['message'] = 'Terjadi kesalahan pada server';
             }
             return response()->json($e->getMessage(), $e->status ?? 500);
+        }
+    }
+
+    public function placeBid(Request $request, $id)
+    {
+        try {
+            $barangLelang = BarangLelang::find($id);
+
+            if ($barangLelang) {
+                if ($request->get('penawaran')) {
+                    $penawaran = $request->get('penawaran');
+                    if ($penawaran > $barangLelang->max_bid) {
+                        if ($barangLelang->kelipatan && $penawaran % $barangLelang->kelipatan != 0) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Kelipatan penawaran tidak sesuai',
+                            ], 422);
+                        }
+
+                        $penawaranLelang = new PenawaranLelang;
+                        $penawaranLelang->id_barang = $id;
+                        $penawaranLelang->harga_penawaran = $penawaran;
+                        $penawaranLelang->username_pengguna = $request->user->username;
+                        $penawaranLelang->save();
+
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Penawaran barang berhasil dimasukkan',
+                        ]);
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Harga penawaran tidak valid',
+                        ], 400);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Input data tidak valid',
+                    ], 422);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (empty($e->status)) {
+                if (isset($e->errorInfo[1])) {
+                    switch ($e->errorInfo[1]) {
+                        default:
+                            $errorData['message'] = 'Terjadi kesalahan pada database';
+                            break;
+                    }
+                } else {
+                    $errorData['message'] = 'Terjadi kesalahan pada server';
+                }
+            } else {
+                $errorData['message'] = 'Input data tidak valid';
+            }
+
+            return response()->json($errorData, $e->status ?? 500);
         }
     }
 }
