@@ -76,7 +76,34 @@ class AuctionController extends Controller
             return response()->json($errorData, $e->status ?? 500);
         }
     }
+    public function getShopAuction($idToko)
+    {
+        try {
+            $barangLelang = BarangLelang::where('id_toko', $idToko)->get();
 
+            if ($barangLelang) {
+                return response()->json($barangLelang);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, $e->status ?? 500);
+        }
+    }
     public function readAuction($id)
     {
         try {
@@ -207,7 +234,7 @@ class AuctionController extends Controller
             // }
 
             // if ($request['max_price']) {
-			// 	$barang->where('');
+            // 	$barang->where('');
             // }
 
             $barang = $barang->get()->all();

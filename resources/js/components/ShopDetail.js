@@ -42,18 +42,25 @@ const data = [
 ];
 
 export default class ShopDetail extends React.PureComponent {
-    constructor(props){
+    constructor(props) {
         super(props);
-        this.state={
-            dataToko : []
+        this.state = {
+            dataToko: [],
+            barangToko: [],
         }
     }
+
     componentWillMount() {
         const id = 1;
         axios.get('/api/toko/' + id)
             .then(ress => {
-                this.setState({dataToko:ress.data.data});
+                this.setState({ dataToko: ress.data.data });
                 console.log(this.state.dataToko)
+            })
+        axios.get('/api/barang/24')
+            .then(ress => {
+                this.setState({ barangToko: ress.data});
+                console.log(ress.data)
             })
     }
     render() {
@@ -113,7 +120,8 @@ export default class ShopDetail extends React.PureComponent {
                             />
                         </Menu>
                     </Col>
-                    <ListBarang />
+                    <ListBarang data={this.state.barangToko} />
+
                 </Row>
             </Col>
         );
