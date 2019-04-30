@@ -23,16 +23,23 @@ Route::get('pengguna/{username}', 'UserController@getOneUser');
 Route::get('cari-barang-lelang', 'AuctionController@searchAuction');
 
 // ShopController
-Route::post('daftar-toko', 'ShopController@createShop');
 Route::get('toko/{id}', 'ShopController@readShop');
 
 // need to authorized
 Route::group(['middleware' => ['checkjwt']], function () {
     Route::get('pengguna', 'UserController@index');
     Route::post('perbarui-profil', 'UserController@updateProfile');
-    Route::post('perbarui-informasi-toko', 'ShopController@updateShop');
-    Route::post('hapus-toko', 'ShopController@deleteShop');
+    Route::post('unggah-foto-profil', 'UserController@uploadPhoto');
+
+    Route::post('daftar-toko', 'ShopController@createShop');
+
     Route::group(['middleware' => ['checktoko']], function () {
-        Route::post('/mulai-lelang', 'AuctionController@createAuction');
+		// ShopController
+		Route::post('unggah-foto-toko', 'ShopController@uploadPhoto');		
+        Route::post('perbarui-informasi-toko', 'ShopController@updateShop');
+        Route::post('hapus-toko', 'ShopController@deleteShop');
+
+		// AuctionController
+        Route::post('mulai-lelang', 'AuctionController@createAuction');
     });
 });
