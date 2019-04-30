@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\AlamatPengiriman;
 use App\Pengguna;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
@@ -10,10 +9,10 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $user = Pengguna::get();
+            $user = Pengguna::where('username', $request->user->username)->first();
             if ($user) {
                 return response()->json([
                     'status' => true,
@@ -52,7 +51,7 @@ class UserController extends Controller
 
         // As you can see we are passing `JWT_SECRET` as the second parameter that will
         // be used to decode the token in the future.
-        return JWT::encode($payload, env('SECRET_TOKEN_KEY'),'HS256');
+        return JWT::encode($payload, env('SECRET_TOKEN_KEY'), 'HS256');
     }
 
     public function getOneUser($username)
@@ -91,7 +90,6 @@ class UserController extends Controller
         try {
             $validatedData = $request->validate([
                 'username' => 'max:32',
-                'email' => 'max:255',
                 'password' => 'required',
             ]);
             $data = Pengguna::where('username', $validatedData['username'])->first();
@@ -199,12 +197,12 @@ class UserController extends Controller
                 $project->save();
                 return response()->json([
                     'status' => true,
-                    'message' => 'Update successed',
+                    'message' => 'Pembaruan profil berhasil',
                 ], 200);
             } else {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Update failed',
+                    'message' => 'Pengguna tidak ditemukan',
                 ], 400);
             }
         } catch (\Exception $e) {

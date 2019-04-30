@@ -15,10 +15,10 @@ require('./bootstrap');
 
 require('./components/Example');
 
-import React, { PureComponent, createContext } from 'react';
+import React, { PureComponent, createContext, Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Switch, Link } from 'react-router-dom';
-import { Layout, Menu, AutoComplete, Input, Button, Icon, Col, Row } from 'antd';
+import { Layout, Menu, AutoComplete, Input, Button, Icon, Popover } from 'antd';
 import FormLoginComponent from './components/FormLogin';
 import ReactModal from 'react-modal';
 // Import component
@@ -43,6 +43,9 @@ export const AppContext = createContext();
 
 const Option = AutoComplete.Option;
 const OptGroup = AutoComplete.OptGroup;
+const SubMenu = Menu.SubMenu;
+const MenuItemGroup = Menu.ItemGroup;
+
 
 const dataSource = [{
 	title: '话题',
@@ -121,6 +124,7 @@ function App() {
 
 class AppChildren extends PureComponent {
 
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -132,8 +136,9 @@ class AppChildren extends PureComponent {
 		};
 	}
 
+
 	componentWillMount() {
-		console.log(this.props.context);
+		this.props.context.checkLogin();
 	}
 
 	showModal = () => {
@@ -154,11 +159,50 @@ class AppChildren extends PureComponent {
 			visible: false,
 		});
 	}
+	popOver() {
+		return (
+			<Fragment>
+				<a >
+					<div>
+
+						Profile
+				<Link to="/profile"></Link>
+
+					</div>
+				</a>
+			</Fragment>
+		)
+	}
+
+	renderButton() {
+		if (this.props.context.loggedIn) {
+			return (
+				<ButtonGroup style={{ float: 'right' }}>
+					<Popover content={this.popOver()} title="Hallo " trigger="hover">
+						<Button >
+							Profile
+										</Button>
+					</Popover>
+				</ButtonGroup>
+
+
+
+			)
+		}
+		return (
+			<ButtonGroup style={{ float: 'right' }}>
+				<Button onClick={this.showModal}>
+					Masuk
+										</Button>
+				<Button type="primary" style={{ fontWeight: 'bold' }}>
+					<Link to="/Register">Daftar</Link>
+				</Button>
+			</ButtonGroup>
+		)
+	}
 
 	render() {
-
-		console.log(this.props.context);
-
+		console.log('render');
 		return (
 			<AppContext.Provider value={this.state}>
 				{/* <AppContext.Consumer>
@@ -193,14 +237,7 @@ class AppChildren extends PureComponent {
 										</AutoComplete>
 									</div>
 								</Menu.Item>
-								<ButtonGroup style={{ float: 'right' }}>
-									<Button onClick={this.showModal}>
-										Masuk
-										</Button>
-									<Button type="primary" style={{ fontWeight: 'bold' }}>
-										<Link to="/Register">Daftar</Link>
-									</Button>
-								</ButtonGroup>
+								{this.renderButton()}
 							</Menu>
 
 						</Layout.Header>
