@@ -291,7 +291,10 @@ class AuctionController extends Controller
 
             if ($barangLelang) {
                 if ($request->get('penawaran')) {
-                    $penawaran = $request->get('penawaran');
+                    $validatedData = $request->validate([
+                        'penawaran' => 'required|numeric|min:0',
+                    ]);
+                    $penawaran = $validatedData['penawaran'];
                     if ($penawaran > $barangLelang->max_bid) {
                         if ($barangLelang->kelipatan && $penawaran % $barangLelang->kelipatan != 0) {
                             return response()->json([
