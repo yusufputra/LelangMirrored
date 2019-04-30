@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
 
 class BarangLelang extends Model
 {
@@ -24,6 +25,7 @@ class BarangLelang extends Model
 
     protected $appends = [
         'max_bid',
+        'foto',
     ];
 
     public function getMaxBidAttribute()
@@ -35,6 +37,22 @@ class BarangLelang extends Model
             }
         }
         return $max;
+    }
+
+    public function getFotoAttribute()
+    {
+        $standardPhotoPath = '/uploads/auction_photo/';
+        $path = public_path() . $standardPhotoPath . $this->attributes['id'];
+        $matchingFiles = File::glob("{$path}_*.*");
+
+        $foto = array();
+
+        foreach ($matchingFiles as $file) {
+            $photo_name = explode('/', $file);
+            $foto[] = url($standardPhotoPath . end($photo_name));
+        }
+
+        return $foto;
     }
 
     public function toko()

@@ -21,6 +21,7 @@ class AuctionController extends Controller
                 'kelipatan' => 'numeric|nullable',
                 'waktu_mulai' => 'required|after:now',
                 'waktu_akhir' => 'after:waktu_mulai|nullable',
+                'photo.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
             $barang_lelang = new BarangLelang;
@@ -41,6 +42,13 @@ class AuctionController extends Controller
             $barang_lelang->jumlah_dilihat = 0;
             $barang_lelang->id_toko = $request->toko->id;
             $barang_lelang->save();
+
+            if ($request->hasfile('photo')) {
+                foreach ($request->file('photo') as $photo) {
+                    $photo->move(public_path() . '/uploads/auction_photo/',
+                        $barang_lelang->id . '_' . uniqid() . '.' . $photo->getClientOriginalExtension());
+                }
+            }
 
             return response()->json([
                 'status' => true,
