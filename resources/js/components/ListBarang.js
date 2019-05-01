@@ -45,7 +45,7 @@ export default class ListBarang extends React.PureComponent {
             data.push({
                 id: element.id,
                 title: element.nama_barang,
-                latestBidPrice : '100000'
+                latestBidPrice : element.max_bid,
             })
         }
         console.log(data)

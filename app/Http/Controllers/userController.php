@@ -46,7 +46,7 @@ class UserController extends Controller
             'iss' => "lelang-in", // Issuer of the token
             'username' => $pengguna->username, // Subject of the token
             'iat' => time(), // Time when JWT was issued.
-            'exp' => time() + 60 * 60, // Expiration time
+            'exp' => time() + (60 * 60 * 24 * 365), // Expiration time
         ];
 
         // As you can see we are passing `JWT_SECRET` as the second parameter that will

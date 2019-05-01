@@ -15,8 +15,38 @@ class BarangLelang extends Model
         'kelipatan',
         'deskripsi',
         'id_toko',
-        'kategori'
+        'kategori',
     ];
+
+    protected $with = [
+        'penawaran',
+    ];
+
+    protected $appends = [
+        'max_bid',
+    ];
+
+    public function getMaxBidAttribute()
+    {
+        $max = 0;
+        foreach ($this->penawaran as $p) {
+            if ($p->harga_penawaran > $max) {
+                $max = $p->harga_penawaran;
+            }
+        }
+        return $max;
+    }
+
+    public function getMinBidAttribute()
+    {
+        $min = 0;
+        foreach ($this->penawaran as $p) {
+            if ($p->harga_penawaran < $min) {
+                $min = $p->harga_penawaran;
+            }
+        }
+        return $min;
+    }
 
     public function toko()
     {
