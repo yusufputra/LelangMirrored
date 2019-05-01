@@ -13,18 +13,20 @@ export default class LandingPage extends Component {
 	}
 
 	componentWillMount() {
-		axios.get('/api/cari-barang-lelang?sortBy=popularity&perPage=10')
+        ///api/cari-barang-lelang?sortBy=popularity&perPage=10
+		axios.get('/api/hotItem')
 			.then(ress => {
 				console.log(ress.data)
 				const data = [];
-				ress.data.data.forEach((element) => {
+				for (let index = 0; index < ress.data.length; index++) {
+					const element = ress.data[index];
 					data.push({
 						id: element.id,
 						title: element.nama_barang,
 						latestBidPrice: element.max_bid,
 						image: (element.foto.length == 0) ? "http://sifatit.com/wp-content/uploads/2012/07/dummy-500x337.jpg" : element.foto[0]
-					});
-				});
+					})
+				}
 				this.setState({ hotItem: data });
 			})
 		axios.get('/api/rekomen')
