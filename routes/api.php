@@ -27,26 +27,31 @@ Route::get('rekomen', 'AuctionController@getRekomen');
 // ShopController
 Route::get('toko/{id}', 'ShopController@readShop');
 
-
 // need to authorized
 Route::group(['middleware' => ['checkjwt']], function () {
     Route::get('pengguna', 'UserController@index');
-	Route::post('perbarui-profil', 'UserController@updateProfile');
-    Route::post('ganti-password', 'UserController@changePassword');	
+    Route::post('perbarui-profil', 'UserController@updateProfile');
+    Route::post('ganti-password', 'UserController@changePassword');
     Route::post('unggah-foto-profil', 'UserController@uploadPhoto');
-	Route::get('histori-transaksi-pengguna', 'TransactionController@getUserTransactionHistory');
-	
-	// Alamat Pengiriman
-	Route::post('tambah-alamat-pengiriman', 'UserController@addAddress');
-	Route::get('alamat-pengiriman', 'UserController@getUserAddress');
-	Route::post('ubah-alamat-pengiriman/{id}', 'UserController@updateAddress');
-	Route::post('hapus-alamat-pengiriman/{id}', 'UserController@deleteAddress');
+    Route::get('histori-transaksi-pengguna', 'TransactionController@getUserTransactionHistory');
+
+    // Alamat Pengiriman
+    Route::post('tambah-alamat-pengiriman', 'UserController@addAddress');
+    Route::get('alamat-pengiriman', 'UserController@getUserAddress');
+    Route::post('ubah-alamat-pengiriman/{id}', 'UserController@updateAddress');
+    Route::post('hapus-alamat-pengiriman/{id}', 'UserController@deleteAddress');
 
     Route::post('daftar-toko', 'ShopController@createShop');
 
     Route::post('penawaran-lelang/{id}', 'AuctionController@placeBid');
+    Route::get('transaksi/{id}', 'TransactionController@getTransaction');
+    Route::post('transaksi/{id}/masukkan-resi', 'TransactionController@inputResi');
+    Route::post('transaksi/{id}/konfirmasi-pembayaran', 'TransactionController@paymentConfirmation');
+    Route::post('transaksi/{id}/konfirmasi-transaksi', 'TransactionController@transactionConfirmation');
 
     Route::group(['middleware' => ['checktoko']], function () {
+        Route::get('cek-toko', 'ShopController@index');
+
         // ShopController
         Route::post('unggah-foto-toko', 'ShopController@uploadPhoto');
         Route::post('perbarui-informasi-toko', 'ShopController@updateShop');

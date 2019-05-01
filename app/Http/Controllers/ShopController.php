@@ -9,6 +9,11 @@ class ShopController extends Controller
 {
     //
 
+    public function index()
+    {
+        return response()->json(['status' => true]);
+    }
+
     public function createShop(Request $request)
     {
         try {
@@ -40,12 +45,12 @@ class ShopController extends Controller
                 if (isset($e->errorInfo[1])) {
                     switch ($e->errorInfo[1]) {
                         case 1062:
-							$errorData['message'] = 'Anda sudah memiliki toko lelang';
-							$e->status = 400;
+                            $errorData['message'] = 'Anda sudah memiliki toko lelang';
+                            $e->status = 400;
                             break;
                         case 1216:
-							$errorData['message'] = 'Data pengguna tidak valid';
-							$e->status = 400;							
+                            $errorData['message'] = 'Data pengguna tidak valid';
+                            $e->status = 400;
                             break;
                         default:
                             $errorData['message'] = 'Terjadi kesalahan pada database';
@@ -69,7 +74,7 @@ class ShopController extends Controller
             if ($tokoLelang) {
                 return response()->json([
                     'status' => true,
-					'data' => $tokoLelang,
+                    'data' => $tokoLelang,
                 ]);
             } else {
                 return response()->json([
@@ -87,7 +92,7 @@ class ShopController extends Controller
                         break;
                 }
             } else {
-                $errorData['message'] = 'Terjadi kesalahan pada server'.$e;
+                $errorData['message'] = 'Terjadi kesalahan pada server' . $e;
             }
             return response()->json($errorData, $e->status ?? 500);
         }

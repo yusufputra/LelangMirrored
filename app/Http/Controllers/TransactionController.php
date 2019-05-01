@@ -43,10 +43,151 @@ class TransactionController extends Controller
             $transaksi = Transaksi::find($id);
 
             if ($transaksi) {
+                if (
+                    $transaksi->username_pengguna == $request->user->username ||
+                    $transaksi->barang->toko->pemilik->username == $request->user->username
+                ) {
+                    return response()->json([
+                        'status' => true,
+                        'data' => $transaksi,
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Anda tidak memiliki izin',
+                    ], 403);
+                }
+            } else {
                 return response()->json([
-                    'status' => true,
-                    'data' => $transaksi,
-                ]);
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, 500);
+        }
+    }
+
+    public function inputResi(Request $request, $id)
+    {
+        try {
+            $validatedData = $request->validate([
+                'resi' => 'required',
+            ]);
+
+            $transaksi = Transaksi::find($id);
+
+            if ($transaksi) {
+                if ($transaksi->barang->toko->pemilik->username == $request->user->username) {
+                    $transaksi->resi = $validatedData['resi'];
+                    $transaksi->status = 2;
+                    $transaksi->save();
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Nomor resi berhasil dimasukkan',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Anda tidak memiliki izin',
+                    ], 403);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, 500);
+        }
+    }
+
+    public function paymentConfirmation(Request $request, $id)
+    {
+        try {
+            $transaksi = Transaksi::find($id);
+
+            if ($transaksi) {
+                if ($transaksi->username_pengguna == $request->user->username) {
+                    $transaksi->status = 1;
+                    $transaksi->save();
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Konfirmasi pembayaran berhasil',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Anda tidak memiliki izin',
+                    ], 403);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, 500);
+        }
+    }
+
+    public function transactionConfirmation(Request $request, $id)
+    {
+        try {
+            $transaksi = Transaksi::find($id);
+
+            if ($transaksi) {
+                if ($transaksi->username_pengguna == $request->user->username) {
+                    $transaksi->status = 3;
+                    $transaksi->save();
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Konfirmasi pembayaran berhasil',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Anda tidak memiliki izin',
+                    ], 403);
+                }
             } else {
                 return response()->json([
                     'status' => false,
