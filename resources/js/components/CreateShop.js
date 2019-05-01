@@ -1,42 +1,54 @@
 import React, { PureComponent } from 'react'
 import {
-    Form, Input, Tooltip, Icon, DatePicker, Select, Row, Col, Checkbox, Button, AutoComplete, Menu, Upload, message
+    Form, Input, Spin, Icon, Select, Row, Col, Checkbox, Button, AutoComplete, Menu, Upload, message
 } from 'antd';
+import { Redirect } from 'react-router'
+
+import Axios from 'axios';
 require('./CreateShop.css');
 
 class RegistrationForm extends PureComponent {
     state = {
         confirmDirty: false,
         autoCompleteResult: [],
-        loading: false
+        loading: false,
+        loadingButton:false,
     };
-
-
-
-    handleChange = (info) => {
-        if (info.file.status === 'uploading') {
-            this.setState({ loading: true });
-            return;
-        }
-        if (info.file.status === 'done') {
-            // Get this url from response in real world.
-            getBase64(info.file.originFileObj, imageUrl => this.setState({
-                imageUrl,
-                loading: false,
-            }));
-        }
-    }
 
 
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.form.validateFieldsAndScroll((err, values) => {
+        this.props.form.validateFieldsAndScroll(async (err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                const body = {
+                    nama_toko: values.nickname,
+                    no_telepon: values.phone,
+                    nama_jalan: values.address,
+                    kelurahan: values.kelurahan,
+                    kode_pos: values.zipcode
+                };
+                console.log(body);
+                this.setState({loadingButton:true});
+                try {
+                    const data = await Axios.post('/api/daftar-toko', body, { headers: { Authorization: localStorage.token } });
+                    console.log(data.data);
+                    this.setState({loadingButton:false});
+                    message.success(`Toko Berhasil Dibuat.. Redirect ke halaman Toko dalam 3 detik...`);
+                    await new Promise(resolve => { setTimeout(resolve, 3000); });
+                    window.location.replace('/shop');
+                }
+                catch (err) {
+                    this.setState({loadingButton:false});
+                    console.log('error');
+                    console.log(err);
+                    message.error(`Terdapat Kesalahan`);
+                    this.setState({ status: true });
+                }
             }
         });
     }
+
 
     handleConfirmBlur = (e) => {
         const value = e.target.value;
@@ -135,7 +147,21 @@ class RegistrationForm extends PureComponent {
                     style={{ marginBottom: '0px' }}
                 >
                     {getFieldDecorator('address', {
-                        rules: [{ type: 'address', required: true, message: 'Mohon isi alamat anda!' }],
+                        rules: [{ type: 'string', required: true, message: 'Mohon isi alamat anda!' }],
+                    })(
+                        <Input placeholder={"Masukkan Alamat Anda"} >
+
+                        </Input>
+                    )}
+                </Form.Item>
+                <Form.Item
+                    colon={false}
+                    style={{ marginBottom: '0px' }}
+                    label={(
+                        <span style={{ fontSize: 20 }}>Kelurahan :</span>
+                    )}        >
+                    {getFieldDecorator('kelurahan', {
+                        rules: [{ type: 'string', required: true, message: 'Mohon isi kodepos anda!' }],
                     })(
                         <Input placeholder={"Masukkan Alamat Anda"} >
 
@@ -149,13 +175,14 @@ class RegistrationForm extends PureComponent {
                         <span style={{ fontSize: 20 }}>Kode Pos :</span>
                     )}        >
                     {getFieldDecorator('zipcode', {
-                        rules: [{ type: 'zipcode', required: true, message: 'Mohon isi kodepos anda!' }],
+                        rules: [{ type: 'string', required: true, message: 'Mohon isi kodepos anda!' }],
                     })(
-                        <Input placeholder={"Masukkan Alamat Anda"} >
+                        <Input placeholder={"Masukkan KodePos"} >
 
                         </Input>
                     )}
                 </Form.Item>
+
                 <Form.Item
                     colon={false}
                     style={{ marginBottom: '0px' }}
@@ -170,33 +197,8 @@ class RegistrationForm extends PureComponent {
                 </Form.Item>
 
                 <Form.Item
-                    colon={false}
-                    style={{ marginBottom: 0 }}
-                    label={(
-                        <span style={{ fontSize: 20 }}>Avatar Toko</span>
-
-                    )}>
-                    {getFieldDecorator('Avatar', {
-                        rules: [{ required: true, message: 'Please Select Shop Image!' }],
-                    })(
-
-                        <Upload
-                            name="avatar"
-                            listType="picture-card"
-                            className="avatar-uploader"
-                            showUploadList={false}
-                            action="//jsonplaceholder.typicode.com/posts/"
-                            beforeUpload={this.beforeUpload}
-                            onChange={this.handleChange}
-                        >
-                            {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
-                        </Upload>
-                    )}
-
-                </Form.Item>
-                <Form.Item
                     style={{ marginBottom: '0px' }} >
-                    <Button block type="primary" htmlType="submit">Register</Button>
+                    <Button block type="primary" htmlType="submit" loading={this.state.loadingButton}>Register</Button>
                 </Form.Item>
             </Form >
         );
@@ -206,13 +208,55 @@ class RegistrationForm extends PureComponent {
 const WrappedRegistrationForm = Form.create({ name: 'register' })(RegistrationForm);
 
 export default class CreateShop extends PureComponent {
+
+    state = {
+        loading: true,
+        status: true,
+        username: undefined,
+    }
+
+    async componentDidMount() {
+        try {
+            const data = await Axios.get('/api/cek-toko/', { headers: { Authorization: localStorage.token } });
+            this.setState({ loading: false })
+            this.setState({ status: false });
+            return Promise.resolve();
+        }
+        catch (err) {
+            this.setState({ loading: false })
+            this.setState({ status: true });
+        }
+    }
+
     render() {
-        return (
-            <Menu style={{ width: '40%', margin: 'auto', padding: 16, borderRadius: 10 }}>
-                <h3 style={{ textAlign: 'center' }}>Buat Toko Lelangmu Sekarang</h3>
-                <WrappedRegistrationForm />
-            </Menu>
-        );
+        if (this.state.loading) {
+            return (
+                <div>
+                    <Spin style={{ marginLeft: '50%' }} />
+                </div>
+            )
+        }
+        else {
+            console.log('status')
+            console.log(this.state.status);
+            if (this.state.status) {
+                return (
+                    <Menu style={{ width: '40%', margin: 'auto', padding: 16, borderRadius: 10 }}>
+                        <h3 style={{ textAlign: 'center' }}>Buat Toko Lelangmu Sekarang</h3>
+                        <WrappedRegistrationForm />
+                    </Menu>
+                );
+            }
+            else {
+                return (
+                    <div>
+                        <Redirect to="/shop">
+
+                        </Redirect>
+                    </div>
+                )
+            }
+        }
     }
 }
 

@@ -4,7 +4,6 @@ import {
 } from 'antd';
 const count = 3;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
-import reqwest from 'reqwest';
 const { Paragraph } = Typography;
 import UserProvider, { UserContext } from '../contexts/UserProvider';
 import ReactModal from 'react-modal';
@@ -189,7 +188,7 @@ class FormData extends PureComponent {
             this.setState({
                 loading:false
             })
-            message.error(`Update Gagl`);
+            message.error(`Update Gagal`);
 
         }
         console.log(data);
@@ -334,7 +333,6 @@ export default class UserProfile extends PureComponent {
 
         });
         return (data.data);
-        console.log(this.state);
     }
 
     renderTab() {
