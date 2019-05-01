@@ -16,6 +16,10 @@ class PenawaranLelang extends Model
         'created_at',
     ];
 
+    protected $with = [
+        'pengguna',
+    ];
+
     public $timestamps = false;
 
     public function pengguna()

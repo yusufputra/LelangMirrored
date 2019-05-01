@@ -12,7 +12,11 @@ class KomentarLelang extends Model
     protected $fillable = [
         'username_pengguna',
         'isi',
-        'id_barang'
+        'id_barang',
+    ];
+
+    protected $with = [
+        'pengguna',
     ];
 
     public function pengguna()

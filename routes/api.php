@@ -45,6 +45,8 @@ Route::group(['middleware' => ['checkjwt']], function () {
     Route::post('daftar-toko', 'ShopController@createShop');
 
     Route::post('penawaran-lelang/{id}', 'AuctionController@placeBid');
+    Route::post('barangdetail/{id}/komentar', 'AuctionController@commentAuction');
+
     Route::get('transaksi/{id}', 'TransactionController@getTransaction');
     Route::post('transaksi/{id}/masukkan-resi', 'TransactionController@inputResi');
     Route::post('transaksi/{id}/konfirmasi-pembayaran', 'TransactionController@paymentConfirmation');

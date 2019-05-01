@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\BarangLelang;
+use App\KomentarLelang;
 use App\PenawaranLelang;
 use Illuminate\Http\Request;
 
@@ -75,7 +76,8 @@ class AuctionController extends Controller
             }
             return response()->json($errorData, $e->status ?? 500);
         }
-    }
+	}
+	
     public function getShopAuction($idToko)
     {
         try {
@@ -103,7 +105,8 @@ class AuctionController extends Controller
             }
             return response()->json($errorData, $e->status ?? 500);
         }
-    }
+	}
+	
     public function getRekomen()
     {
         try {
@@ -168,7 +171,7 @@ class AuctionController extends Controller
     public function readAuction($id)
     {
         try {
-            $barangLelang = BarangLelang::where('id', $id)->first();
+            $barangLelang = BarangLelang::where('id', $id)->with('komentar')->first();
 
             if ($barangLelang) {
                 $barangLelang->jumlah_dilihat = $barangLelang->jumlah_dilihat + 1;
@@ -303,10 +306,18 @@ class AuctionController extends Controller
     public function searchAuction(Request $request)
     {
         try {
-            $barang = BarangLelang::has('transaksi', '=', 0);
+            if ($request->get('all')) {
+                $barang = BarangLelang::whereRaw('1 = 1');
+            } else {
+                $barang = BarangLelang::has('transaksi', '=', 0);
+            }
 
             if ($request->get('keyword')) {
                 $barang->where('nama_barang', 'LIKE', '%' . $request->get('keyword') . '%');
+            }
+
+            if ($request->get('by')) {
+                $barang->where('id_toko', $request->get('by'));
             }
 
             if ($request->get('sortBy')) {
@@ -464,6 +475,49 @@ class AuctionController extends Controller
             if (empty($e->status)) {
                 if (isset($e->errorInfo[1])) {
                     switch ($e->errorInfo[1]) {
+                        default:
+                            $errorData['message'] = 'Terjadi kesalahan pada database';
+                            break;
+                    }
+                } else {
+                    $errorData['message'] = 'Terjadi kesalahan pada server';
+                }
+            } else {
+                $errorData['message'] = 'Input data tidak valid';
+            }
+
+            return response()->json($errorData, $e->status ?? 500);
+        }
+    }
+
+    public function commentAuction(Request $request, $id)
+    {
+        try {
+            $validatedData = $request->validate([
+                'isi' => 'required',
+            ]);
+
+            $komentar = new KomentarLelang;
+            $komentar->username_pengguna = $request->user->username;
+            $komentar->isi = $validatedData['isi'];
+            $komentar->id_barang = $id;
+
+            $komentar->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Komentar berhasil dikirim',
+            ]);
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (empty($e->status)) {
+                if (isset($e->errorInfo[1])) {
+                    switch ($e->errorInfo[1]) {
+                        case 1216:
+                            $errorData['message'] = 'Data pengguna tidak valid';
+                            $e->status = 400;
+                            break;
                         default:
                             $errorData['message'] = 'Terjadi kesalahan pada database';
                             break;
