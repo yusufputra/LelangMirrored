@@ -160,7 +160,7 @@ class AppChildren extends PureComponent {
 
 	logOut = () => {
 		localStorage.clear();
-		window.location.reload();
+		window.location.replace('/');
 	}
 
 	handleCancel = (e) => {
@@ -179,7 +179,7 @@ class AppChildren extends PureComponent {
 
 		return (
 			<Fragment>
-				<Link to='/'>
+				<Link to='/profile'>
 					<div>
 						Profile
 					</div>
@@ -227,13 +227,16 @@ class AppChildren extends PureComponent {
 		console.log('render');
 		return (
 			<AppContext.Provider value={this.state}>
-				{/* <AppContext.Consumer>
-					{(context) => console.log(context)}
-				</AppContext.Consumer> */}
+
 				<BrowserRouter>
 					<Layout>
 						<Layout.Header style={{ backgroundColor: 'white' }} className="header">
-							<div className="logo" ><img src="/LelangInCropped.png" width="100%" /></div>
+							<Link to='/'>
+								<div className="logo" >
+									<img src="/LelangInCropped.png" width="100%" />
+								</div>
+							</Link>
+
 							<Menu
 								theme={'light'}
 								mode={'horizontal'}

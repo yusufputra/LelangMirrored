@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import {
-    Form, Input, DatePicker, Icon, Avatar, Select, Row, Col, Card, Spin, List, Button, Skeleton, Tabs, Typography
+    Form, Upload, DatePicker, Icon, Avatar, message, Row, Col, Card, Spin, List, Button, Skeleton, Tabs, Typography
 } from 'antd';
 const count = 3;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
@@ -8,7 +8,7 @@ import reqwest from 'reqwest';
 const { Paragraph } = Typography;
 import UserProvider, { UserContext } from '../contexts/UserProvider';
 import ReactModal from 'react-modal';
-
+import axios from 'axios';
 // prepare for activity list if you want.
 
 class ActivityList extends PureComponent {
@@ -20,46 +20,53 @@ class ActivityList extends PureComponent {
     }
 
     componentDidMount() {
-        this.getData((res) => {
-            this.setState({
-                initLoading: false,
-                data: res.results,
-                list: res.results,
-            });
-        });
+        this.getData();
     }
 
-    getData = (callback) => {
-        reqwest({
-            url: fakeDataUrl,
-            type: 'json',
-            method: 'get',
-            contentType: 'application/json',
-            success: (res) => {
-                callback(res);
-            },
-        });
-    }
+    // getData = (callback) => {
+    //     reqwest({
+    //         url: fakeDataUrl,
+    //         type: 'json',
+    //         method: 'get',
+    //         contentType: 'application/json',
+    //         success: (res) => {
+    //             callback(res);
+    //         },
+    //     });
+    // }
 
-    onLoadMore = () => {
+    async getData() {
+        const token = localStorage.token;
+        const data = await axios.get('/api/alamat-pengiriman', { headers: { Authorization: token } });
+        console.log('terpanggil');
+        console.log(data);
         this.setState({
-            loading: true,
-            list: this.state.data.concat([...new Array(count)].map(() => ({ loading: true, name: {} }))),
-        });
-        this.getData((res) => {
-            const data = this.state.data.concat(res.results);
-            this.setState({
-                data,
-                list: data,
-                loading: false,
-            }, () => {
-                // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-                // In real scene, you can using public method of react-virtualized:
-                // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-                window.dispatchEvent(new Event('resize'));
-            });
-        });
+            initLoading: false,
+            data: data.data.data,
+            list: data.data.data
+        })
+        return (data);
     }
+
+    // onLoadMore = () => {
+    //     this.setState({
+    //         loading: true,
+    //         list: this.state.data.concat([...new Array(count)].map(() => ({ loading: true, name: {} }))),
+    //     });
+    //     this.getData((res) => {
+    //         const data = this.state.data.concat(res.results);
+    //         this.setState({
+    //             data,
+    //             list: data,
+    //             loading: false,
+    //         }, () => {
+    //             // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
+    //             // In real scene, you can using public method of react-virtualized:
+    //             // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
+    //             window.dispatchEvent(new Event('resize'));
+    //         });
+    //     });
+    // }
 
     render() {
         const { initLoading, loading, list } = this.state;
@@ -68,7 +75,7 @@ class ActivityList extends PureComponent {
                 textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px',
             }}
             >
-                <Button onClick={this.onLoadMore}>loading more</Button>
+                <Button onClick={this.onLoadMore}>Tambah Alamat</Button>
             </div>
         ) : null;
 
@@ -125,14 +132,17 @@ class ActivityList extends PureComponent {
 
 class FormData extends PureComponent {
 
-    state = {
-        getData: true,
-        email: undefined,
-        foto: undefined,
-        nama: undefined,
-        tanggal_lahir: undefined,
-        username: undefined,
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            getData: true,
+            email: undefined,
+            foto: undefined,
+            nama: undefined,
+            tanggal_lahir: undefined,
+            username: undefined,
+        };
+    }
     handleCancel = (e) => {
         this.setState({
             visible: false,
@@ -150,12 +160,39 @@ class FormData extends PureComponent {
             username: data.data.data.username,
             foto: data.data.data.foto,
             getData: false,
-            visible: false
+            visible: false,
+            loading:false,
         });
     }
 
     showDatePicker() {
         this.setState({ visible: true });
+    }
+
+    sendData = async () => {
+        this.setState({
+            loading:true
+        })
+        const body = {
+            nama: this.state.nama,
+            email: this.state.email,
+            tanggal_lahir: this.state.tanggal_lahir
+        }
+        const data = await axios.post('/api/perbarui-profil', body, { headers: { Authorization: localStorage.token } });
+        if (data.status === 200){
+            this.setState({
+                loading:false
+            })
+            message.success(`Profile Updated`);
+        }
+        else {
+            this.setState({
+                loading:false
+            })
+            message.error(`Update Gagl`);
+
+        }
+        console.log(data);
     }
 
     render() {
@@ -230,7 +267,7 @@ class FormData extends PureComponent {
                     }}> Save Change </Button>
                 </ReactModal>
                 <div style={{ margin: 'auto' }}>
-                    <Button>Save Change</Button>
+                    <Button onClick={this.sendData} loading={this.state.loading}>Save Change</Button>
                 </div>
             </Card>
         )
@@ -261,7 +298,9 @@ export default class UserProfile extends PureComponent {
         tanggal_lahir: undefined,
         username: undefined,
         height: 0,
-        width: 0
+        width: 0,
+        upload: undefined,
+        uploading: false
     };
 
     constructor() {
@@ -355,33 +394,81 @@ export default class UserProfile extends PureComponent {
             );
         }
     }
+    handleUpload = () => {
+        const { upload } = this.state;
+        //handling upload
+    }
+
+
 
     render() {
+        const { uploading, upload } = this.state;
+
+        const props = {
+            onRemove: (file) => {
+                this.setState((state) => {
+                    upload: undefined
+                });
+            },
+            beforeUpload: (file) => {
+                this.setState(state => ({
+                    upload: [file],
+                }));
+                return false;
+            },
+            upload,
+        };
+        if (localStorage.token) {
+            return (
+                <Row gutter={24}>
+                    <Col
+
+                        xl={{ span: 8 }}
+                        xxl={{ span: 6 }}
+                        style={{ textAlign: 'center' }}
+                    >
+                        <Card style={{ borderRadius: 8, boxShadow: "rgba(0, 0, 0, 0.12) 0px 2px 8px 0px" }}>
+                            <Skeleton loading={this.state.getData} active avatar={{ size: "large" }} paragraph={false} title={false} >
+                                <Avatar size={200} src={this.state.foto} />
+
+
+                            </Skeleton>
+                            <Skeleton loading={this.state.getData} active paragraph={false}>
+                                <h3 style={{ marginTop: 10 }}>{this.state.nama}</h3>
+
+                            </Skeleton>
+                            <Skeleton loading={this.state.getData} active paragraph={false}>
+                                <Upload {...props}>
+                                    <Button>
+                                        <Icon type="upload" /> Pilih Avatar
+                                  </Button>
+                                </Upload>
+                                <Button
+                                    type="primary"
+                                    onClick={this.handleUpload}
+                                    disabled={this.state.upload === undefined}
+                                    loading={this.state.uploading}
+                                    style={{ marginTop: 16 }}
+                                >
+                                    {this.state.uploading ? 'Upload Foto...' : 'Upload Foto'}
+                                </Button>
+
+                            </Skeleton>
+
+                        </Card>
+                    </Col>
+                    <Col
+
+                        xl={{ span: 16 }}
+                        xxl={{ span: 18 }}
+                    >
+                        {this.renderTab()}
+                    </Col>
+                </Row>
+            );
+        }
         return (
-            <Row gutter={24}>
-                <Col
-
-                    xl={{ span: 8 }}
-                    xxl={{ span: 6 }}
-                    style={{ textAlign: 'center' }}
-                >
-                    <Card style={{ borderRadius: 8, boxShadow: "rgba(0, 0, 0, 0.12) 0px 2px 8px 0px" }}>
-                        <Skeleton loading={this.state.getData} active avatar={{ size: "large" }} paragraph={false} title={false} >
-                            <Avatar size={200} src={this.state.foto} />
-                        </Skeleton>
-                        <Skeleton loading={this.state.getData} active paragraph={false}>
-                            <h3 style={{ marginTop: 10 }}>{this.state.nama}</h3>
-                        </Skeleton>
-                    </Card>
-                </Col>
-                <Col
-
-                    xl={{ span: 16 }}
-                    xxl={{ span: 18 }}
-                >
-                    {this.renderTab()}
-                </Col>
-            </Row>
-        );
+            <h1>Please Login </h1>
+        )
     }
 }
