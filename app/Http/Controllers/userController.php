@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AlamatPengiriman;
 use App\Pengguna;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
@@ -179,21 +180,18 @@ class UserController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'username' => 'required|alpha_dash',
                 'email' => 'required',
                 'nama' => 'required',
-                'password' => 'required',
                 'tanggal_lahir' => 'required',
             ]);
 
-            $project = Pengguna::where('username', $validatedData['username'])->first();
+            $project = Pengguna::where('username', $request->user->username)->first();
 
             if ($project) {
-                $project->username = $validatedData['username'];
                 $project->email = $validatedData['email'];
                 $project->nama = $validatedData['nama'];
-                $project->password = bcrypt($validatedData['password']);
-                $project->tanggal_lahir = $validatedData['tanggal_lahir'];
+				$project->tanggal_lahir = $validatedData['tanggal_lahir'];
+				
                 $project->save();
                 return response()->json([
                     'status' => true,
@@ -203,7 +201,54 @@ class UserController extends Controller
                 return response()->json([
                     'status' => false,
                     'message' => 'Pengguna tidak ditemukan',
-                ], 400);
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
+        }
+    }
+
+    public function changePassword(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'old_password' => 'required',
+                'new_password' => 'required',
+            ]);
+
+            $project = Pengguna::where('username', $request->user->username)->first();
+
+            if ($project) {
+                if (Hash::check($validatedData['old_password'], $project->password)) {
+                    $project->password = $validatedData['new_password'];
+
+                    $project->save();
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Penggantian password berhasil',
+                    ], 200);
+                } else {
+					return response()->json([
+						'status' => false,
+						'message' => 'Password lama tidak sesuai',
+					], 400);
+				}
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pengguna tidak ditemukan',
+                ], 404);
             }
         } catch (\Exception $e) {
             $errorData = ['status' => false];
@@ -245,5 +290,173 @@ class UserController extends Controller
             'status' => false,
             'message' => 'Pengunggahan foto gagal',
         ], 400);
+    }
+
+    public function addAddress(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'nama_penerima' => 'required|max:255',
+                'no_telepon' => 'required',
+                'nama_jalan' => 'required|max:255',
+                'kelurahan' => 'required|max:255',
+                'kode_pos' => 'required|integer',
+            ]);
+
+            $pengguna = AlamatPengiriman::create([
+                'username_pengguna' => $request->user->username,
+                'nama_penerima' => $validatedData['nama_penerima'],
+                'no_telepon' => $validatedData['no_telepon'],
+                'nama_jalan' => $validatedData['nama_jalan'],
+                'kelurahan' => $validatedData['kelurahan'],
+                'kode_pos' => $validatedData['kode_pos'],
+            ]);
+
+            if ($pengguna) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Alamat berhasil ditambahkan',
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Registrasi gagal',
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
+        }
+    }
+
+    public function getUserAddress(Request $request)
+    {
+        try {
+            $alamat_pengiriman = AlamatPengiriman::where('username_pengguna', $request->user->username)->get();
+
+            return response()->json([
+                'status' => true,
+                'data' => $alamat_pengiriman,
+            ], 200);
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
+        }
+    }
+
+    public function updateAddress(Request $request, $id)
+    {
+        try {
+            $validatedData = $request->validate([
+                'nama_penerima' => 'required|max:255',
+                'no_telepon' => 'required',
+                'nama_jalan' => 'required|max:255',
+                'kelurahan' => 'required|max:255',
+                'kode_pos' => 'required|integer',
+            ]);
+
+            $alamat_pengiriman = AlamatPengiriman::where('id', $id)->first();
+
+            if ($alamat_pengiriman) {
+                if ($alamat_pengiriman->username_pengguna == $request->user->username) {
+                    $alamat_pengiriman->nama_penerima = $validatedData['nama_penerima'];
+                    $alamat_pengiriman->no_telepon = $validatedData['no_telepon'];
+                    $alamat_pengiriman->nama_jalan = $validatedData['nama_jalan'];
+                    $alamat_pengiriman->kelurahan = $validatedData['kelurahan'];
+                    $alamat_pengiriman->kode_pos = $validatedData['kode_pos'];
+
+                    $alamat_pengiriman->save();
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Pembaruan alamat pengiriman berhasil',
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Anda tidak memiliki izin',
+                    ], 403);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Alamat tidak ditemukan',
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
+        }
+    }
+
+    public function deleteAddress(Request $request, $id)
+    {
+        try {
+
+            $alamat_pengiriman = AlamatPengiriman::where('id', $id)->first();
+
+            if ($alamat_pengiriman) {
+                if ($alamat_pengiriman->username_pengguna == $request->user->username) {
+                    $alamat_pengiriman->delete();
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Alamat berhasil dihapus',
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Anda tidak memiliki izin',
+                    ], 403);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Alamat tidak ditemukan',
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
+        }
     }
 }
