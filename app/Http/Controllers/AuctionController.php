@@ -76,8 +76,8 @@ class AuctionController extends Controller
             }
             return response()->json($errorData, $e->status ?? 500);
         }
-	}
-	
+    }
+
     public function getShopAuction($idToko)
     {
         try {
@@ -105,8 +105,8 @@ class AuctionController extends Controller
             }
             return response()->json($errorData, $e->status ?? 500);
         }
-	}
-	
+    }
+
     public function getRekomen()
     {
         try {
@@ -171,7 +171,7 @@ class AuctionController extends Controller
     public function readAuction($id)
     {
         try {
-            $barangLelang = BarangLelang::where('id', $id)->with('komentar')->first();
+            $barangLelang = BarangLelang::where('id', $id)->with(['komentar', 'toko'])->first();
 
             if ($barangLelang) {
                 $barangLelang->jumlah_dilihat = $barangLelang->jumlah_dilihat + 1;

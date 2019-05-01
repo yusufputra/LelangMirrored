@@ -21,7 +21,7 @@ class KomentarLelang extends Model
 
     public function pengguna()
     {
-        return $this->belongsTo('App\User', 'username_pengguna', 'username');
+        return $this->belongsTo('App\Pengguna', 'username_pengguna', 'username');
     }
 
     public function barang()

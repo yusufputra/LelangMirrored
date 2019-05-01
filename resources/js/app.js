@@ -134,22 +134,23 @@ class AppChildren extends PureComponent {
 			},
 			visible: false,
 			getData: true,
-            username: undefined,
-            dataSource: []
+			username: undefined,
+			dataSource: []
 		};
 	}
 
-    handleSearch = (value) => {
-        this.setState({
-          dataSource: !value ? [] : [
-            value
-          ],
-        });
-      }
+	handleSearch = (value) => {
+		this.setState({
+			dataSource: !value ? [] : [
+				value
+			],
+		});
+	}
+
 	componentWillMount = async () => {
 		this.props.context.checkLogin();
-
 	}
+
 	async componentDidMount() {
 		const token = localStorage.token;
 		const data = await axios.get('/api/pengguna', { headers: { Authorization: token } });
@@ -182,20 +183,21 @@ class AppChildren extends PureComponent {
 			visible: false,
 		});
 	}
+
 	popOver() {
 
 		return (
 			<Fragment>
 				<Link to='/profile'>
 					<div>
-						Profile
+						{'Profile'}
 					</div>
 				</Link>
-				<Link >
+				<Link>
 					<div>
 						<a onClick={this.logOut}>
-							Logout
-				</a>
+							{'Logout'}
+						</a>
 					</div>
 				</Link>
 			</Fragment>
@@ -207,24 +209,21 @@ class AppChildren extends PureComponent {
 		if (this.props.context.loggedIn) {
 			return (
 				<ButtonGroup style={{ float: 'right' }}>
-					<Popover content={this.popOver()} title="Hallo " trigger="hover">
+					<Popover placement="bottomRight" content={this.popOver()} title="Hallo " trigger="hover">
 						<Button loading={this.state.getData}>
 							{this.state.username}
 						</Button>
 					</Popover>
 				</ButtonGroup>
-
-
-
-			)
+			);
 		}
 		return (
 			<ButtonGroup style={{ float: 'right' }}>
 				<Button onClick={this.showModal}>
-					Masuk
-										</Button>
+					{'Masuk'}
+				</Button>
 				<Button type="primary" style={{ fontWeight: 'bold' }}>
-					<Link to="/Register">Daftar</Link>
+					<Link to="/register">Daftar</Link>
 				</Button>
 			</ButtonGroup>
 		)
@@ -234,7 +233,6 @@ class AppChildren extends PureComponent {
 		console.log('render');
 		return (
 			<AppContext.Provider value={this.state}>
-
 				<BrowserRouter>
 					<Layout>
 						<Layout.Header style={{ backgroundColor: 'white' }} className="header">
@@ -321,7 +319,7 @@ class AppChildren extends PureComponent {
 								<Route path='/checkout' component={Checkout} />
 								<Route path='/search' component={Search} />
 								<Route path='/shop' component={ShopDetail} />
-								<Route path='/Register' component={Register} />
+								<Route path='/register' component={Register} />
 								<Route path='/profile' component={UserProfile} />
 								<Route path='/createShop' component={CreateShop} />
 								<Route path='/createLelang' component={CreateLelang} />
