@@ -185,18 +185,17 @@ class AppChildren extends PureComponent {
 	}
 
 	popOver() {
-
 		return (
 			<Fragment>
 				<Link to='/profile'>
 					<div>
-						{'Profile'}
+						{'Profil'}
 					</div>
 				</Link>
 				<Link>
 					<div>
 						<a onClick={this.logOut}>
-							{'Logout'}
+							{'Keluar akun'}
 						</a>
 					</div>
 				</Link>
@@ -209,7 +208,7 @@ class AppChildren extends PureComponent {
 		if (this.props.context.loggedIn) {
 			return (
 				<ButtonGroup style={{ float: 'right' }}>
-					<Popover placement="bottomRight" content={this.popOver()} title="Hallo " trigger="hover">
+					<Popover placement="bottomRight" content={this.popOver()} title={`Halo, ${this.state.username}`} trigger="hover">
 						<Button loading={this.state.getData}>
 							{this.state.username}
 						</Button>
@@ -308,7 +307,7 @@ class AppChildren extends PureComponent {
 							<a onClick={this.handleCancel} style={{ marginLeft: '100%' }}>
 								<Icon type="close-circle" style={{ fontSize: 25 }} />
 							</a>
-							<FormLoginComponent></FormLoginComponent>
+							<FormLoginComponent />
 						</ReactModal>
 
 						<Layout.Content style={{ padding: '0 50px', marginTop: 64 }}>
