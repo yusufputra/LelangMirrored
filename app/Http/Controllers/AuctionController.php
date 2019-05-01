@@ -76,7 +76,94 @@ class AuctionController extends Controller
             return response()->json($errorData, $e->status ?? 500);
         }
     }
+    public function getShopAuction($idToko)
+    {
+        try {
+            $barangLelang = BarangLelang::where('id_toko', $idToko)->get();
 
+            if ($barangLelang) {
+                return response()->json($barangLelang);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, $e->status ?? 500);
+        }
+    }
+    public function getRekomen()
+    {
+        try {
+            $barangLelang = BarangLelang::orderBy('id','DESC')
+                            ->limit(10)
+                            ->get();
+
+            if ($barangLelang) {
+                return response()->json($barangLelang);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, $e->status ?? 500);
+        }
+    }
+    public function getHotItem()
+    {
+        try {
+            $barangLelang = BarangLelang::orderBy('jumlah_dilihat','DESC')
+                            ->limit(10)
+                            ->get();
+
+            if ($barangLelang) {
+                return response()->json($barangLelang);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, $e->status ?? 500);
+        }
+    }
     public function readAuction($id)
     {
         try {
@@ -216,25 +303,20 @@ class AuctionController extends Controller
     {
         try {
             $barang = BarangLelang::whereRaw("1 = 1");
-
             if ($request->get('keyword')) {
                 $barang->where('nama_barang', 'LIKE', '%' . $request->get('keyword') . '%');
             }
-
             $barang = $barang->get();
-
             if ($request->get('max')) {
                 $barang = $barang->filter(function ($element) use ($request) {
                     return $element->max_bid <= $request->get('max');
                 });
             }
-
             if ($request->get('min')) {
                 $barang = $barang->filter(function ($element) use ($request) {
                     return $element->max_bid >= $request->get('max');
                 });
             }
-
             // if ($request->get('sortBy')) {
             //     switch ($request->get('sortBy')) {
             //         case 'name':
@@ -257,11 +339,9 @@ class AuctionController extends Controller
             //             break;
             //     }
             // }
-
             if ($request->get('perPage')) {
                 $temp = $barang;
                 $barang = array();
-
                 $page = $request->get('page') ?? 1;
                 for ($i = ($page - 1) * $request->get('perPage'); $i < $page * $request->get('perPage'); $i++) {
                     if (isset($temp[$i])) {
@@ -271,14 +351,12 @@ class AuctionController extends Controller
                     }
                 }
             }
-
             return response()->json([
                 'status' => true,
                 'data' => $barang,
             ], 200);
         } catch (\Exception $e) {
             $errorData = ['status' => false];
-
             if (isset($e->errorInfo[1])) {
                 switch ($e->errorInfo[1]) {
                     default:

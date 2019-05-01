@@ -21,9 +21,12 @@ Route::post('daftar', 'UserController@daftar');
 Route::get('pengguna/{username}', 'UserController@getOneUser');
 
 Route::get('cari-barang-lelang', 'AuctionController@searchAuction');
-
+Route::get('barang/{idToko}', 'AuctionController@getShopAuction');
+Route::get('hotItem', 'AuctionController@getHotItem');
+Route::get('rekomen', 'AuctionController@getRekomen');
 // ShopController
 Route::get('toko/{id}', 'ShopController@readShop');
+
 
 // need to authorized
 Route::group(['middleware' => ['checkjwt']], function () {
