@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Layout, Row, Col, Tabs, Carousel, Comment, Avatar, Form, Button, List, Input, Table, Card, Icon, Menu, Typography, Divider, Spin, Breadcrumb } from 'antd';
+import { Layout, Row, Col, Tabs, Carousel, Comment, Avatar, Form, Button, List, Input, Table, Card, Icon, Menu, Typography, Divider, Spin, Breadcrumb, Skeleton } from 'antd';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
 import reqwest from 'reqwest';
@@ -76,7 +76,7 @@ const Editor = ({
             </Form.Item>
         </div>
     );
-
+const penawaran = [];
 export default class ItemDetails extends Component {
     state = {
         comments: [],
@@ -84,25 +84,75 @@ export default class ItemDetails extends Component {
         submitting: false,
         value: '',
         data: [],
+        load: false,
         loading: false,
         hasMore: true,
         barang: [],
         foto: [],
-        dataToko: []
+        dataToko: [],
+        penawaran: [],
+        user: []
     }
-
+    handleSubmit = (value) => {
+        this.setState({ load: true })
+        console.log(localStorage.token)
+        const idBarang = this.state.barang.id;
+        const URL = '/api/penawaran-lelang/' + idBarang;
+        const id = this.props.location.hash.substring(1);
+        Axios.post(URL, {
+            'penawaran': value
+        },
+            {
+                headers: { Authorization: localStorage.token }
+            }).then(ress => {
+                console.log(ress)
+                alert("Sukses Menawar");
+                Axios.get('/api/barangdetail/' + id)
+                    .then(resss => {
+                        this.setState({ penawaran: resss.data.data.penawaran });
+                    })
+                this.setState({ load: false })
+            }).catch(err => {
+                alert("Masukkan angka yang lebih tinggi dan sesuai kelipatan");
+                Axios.get('/api/barangdetail/' + id)
+                    .then(resss => {
+                        this.setState({ penawaran: resss.data.data.penawaran });
+                    })
+                this.setState({ load: false })
+            })
+    }
     componentWillMount() {
+        this.setState({ load: true })
         const id = this.props.location.hash.substring(1);
         Axios.get('/api/barangdetail/' + id)
             .then(ress => {
                 this.setState({ barang: ress.data.data });
-                this.setState({ foto: ress.data.data.foto })
-                console.log(this.state.barang.penawaran)
+                this.setState({ penawaran: this.state.barang.penawaran });
+                this.setState({ foto: ress.data.data.foto });
+                const data = [];
+                for (let index = 0; index < this.state.barang.komentar.length; index++) {
+                    const element = this.state.barang.komentar[index];
+                    data.push({
+                        author: element.username_pengguna,
+                        avatar: element.pengguna.foto,
+                        content: <p>{element.isi}</p>,
+                        datetime: element.created_at,
+                    })
+                }
+                this.setState({ comments: data });
+
+                console.log(this.state.barang)
                 Axios.get('/api/toko/' + this.state.barang.id_toko)
                     .then(ress => {
                         this.setState({ dataToko: ress.data.data });
-                        console.log(this.state.dataToko)
+                        console.log(this.state.dataToko);
                     })
+            })
+        Axios.get('/api/pengguna', { headers: { Authorization: localStorage.token } })
+            .then(ress => {
+                this.setState({ user: ress.data.data });
+                console.log(this.state.user)
+                this.setState({ load: false })
             })
 
     }
@@ -156,15 +206,26 @@ export default class ItemDetails extends Component {
         this.setState({
             submitting: true,
         });
-
+        const id = this.props.location.hash.substring(1);
+        Axios.post('/api/barangdetail/' + id + '/komentar', {
+            'isi': this.state.value
+        }, {
+            headers: {
+                Authorization: localStorage.token
+            }
+            }).then(ress=>{
+                console.log(ress);
+            }).catch(err=>{
+                alert(err);
+            })
         setTimeout(() => {
             this.setState({
                 submitting: false,
                 value: '',
                 comments: [
                     {
-                        author: 'Han Solo',
-                        avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+                        author: this.state.user.username,
+                        avatar: this.state.user.foto,
                         content: <p>{this.state.value}</p>,
                         datetime: moment().fromNow(),
                     },
@@ -222,11 +283,13 @@ export default class ItemDetails extends Component {
                     <Col xxl={20} xl={20}>
                         <Row gutter={16}>
                             <Col xxl={9} xl={9}>
-                                <Carousel afterChange={onChange} autoplay>
-                                    {(this.state.foto.length == 0) &&
-                                        <div><img src="https://imgur.com/f0iMfy9.png" /></div>}
-                                    {(this.state.foto.length != 0) && this.state.barang.foto.map(ress => (<div><img src={ress} /></div>))}
-                                </Carousel>
+                                <Skeleton loading={this.state.load} active>
+                                    <Carousel afterChange={onChange} autoplay>
+                                        {(this.state.foto.length == 0) &&
+                                            <div><img src="https://imgur.com/f0iMfy9.png" /></div>}
+                                        {(this.state.foto.length != 0) && this.state.barang.foto.map(ress => (<div><img src={ress} /></div>))}
+                                    </Carousel>
+                                </Skeleton>
                             </Col>
                             <Col xxl={15} xl={15}>
                                 <Menu style={{ padding: 16 }}>
@@ -250,32 +313,7 @@ export default class ItemDetails extends Component {
                                                 <b>Waktu</b>
                                             </Col>
                                         </Row>
-                                        <List
-                                            size="small"
-                                            bordered
-                                            dataSource={this.state.barang.penawaran}
-                                            renderItem={item => (
-                                                <List.Item>
-                                                    <Row type="flex" style={{ width: '100%' }}>
-                                                        <Col
-                                                            xs={24} sm={24} md={12} lg={8} xl={8} xxl={8}
-                                                        >
-                                                            {item.username_pengguna}
-                                                        </Col>
-                                                        <Col
-                                                            xs={24} sm={24} md={12} lg={8} xl={8} xxl={8}
-                                                        >
-                                                            {item.harga_penawaran}
-                                                        </Col>
-                                                        <Col
-                                                            xs={0} sm={0} md={0} lg={8} xl={8} xxl={8}
-                                                        >
-                                                            {item.created_at}
-                                                        </Col>
-                                                    </Row>
-                                                </List.Item>
-                                            )}
-                                        />
+
                                         <div className="demo-infinite-container">
                                             <InfiniteScroll
                                                 initialLoad={false}
@@ -285,15 +323,15 @@ export default class ItemDetails extends Component {
                                                 useWindow={false}
                                             >
                                                 <List
-                                                    dataSource={this.state.barang.penawaran}
+                                                    dataSource={this.state.penawaran}
                                                     renderItem={item => (
                                                         <List.Item key={item.id}>
                                                             <List.Item.Meta
-                                                                avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                                                                avatar={<Avatar src={item.pengguna.foto} />}
                                                                 title={<a href="https://ant.design">{item.username_pengguna}</a>}
                                                                 description={item.created_at}
                                                             />
-                                                            <div>Bid</div>
+                                                            <div>{item.harga_penawaran}</div>
                                                         </List.Item>
                                                     )}
                                                 >
@@ -306,13 +344,16 @@ export default class ItemDetails extends Component {
                                             </InfiniteScroll>
                                         </div>
                                         <div style={{ textAlign: "center", marginTop: 16 }}>
+
                                             <Input.Search
                                                 placeholder="Masukkan harga penawaranmu"
                                                 addonBefore="Rp"
                                                 enterButton="Tawar Barang"
                                                 size="large"
-                                                onSearch={value => console.log(value)}
+                                                disabled={this.state.load}
+                                                onSearch={(value) => this.handleSubmit(value)}
                                             />
+                                            {this.state.load && <Spin />}
                                         </div>
                                     </Card>
                                 </Menu>
@@ -346,8 +387,8 @@ export default class ItemDetails extends Component {
                                 <Comment
                                     avatar={(
                                         <Avatar
-                                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                                            alt="Han Solo"
+                                            src={this.state.user.foto}
+                                            alt={this.state.user.username}
                                         />
                                     )}
                                     content={(
@@ -363,29 +404,31 @@ export default class ItemDetails extends Component {
                         </Tabs>
                     </Col>
                     <Col xxl={4} xl={4}>
-                        <Card
-                            cover={<img alt="example" src={this.state.dataToko.foto} />}
-                        >
-                            <Meta
-                                title={<Link to={'/shop#' + this.state.dataToko.id}><Typography.Title level={4}>{this.state.dataToko.nama_toko}</Typography.Title></Link>}
-                                description={(
-                                    <div style={{ textAlign: "center" }}>
-                                        <div>
-                                            {this.state.dataToko.nama_jalan + ', ' + this.state.dataToko.kode_pos}
-                                        </div>
-                                        <Divider orientation="left" style={{ fontSize: 8 }}>
-                                            Pengiriman yang didukung
+                        <Skeleton loading={this.state.load} active>
+                            <Card
+                                cover={<img alt="example" src={this.state.dataToko.foto} />}
+                            >
+                                <Meta
+                                    title={<Link to={'/shop#' + this.state.dataToko.id}><Typography.Title level={4}>{this.state.dataToko.nama_toko}</Typography.Title></Link>}
+                                    description={(
+                                        <div style={{ textAlign: "center" }}>
+                                            <div>
+                                                {this.state.dataToko.nama_jalan + ', ' + this.state.dataToko.kode_pos}
+                                            </div>
+                                            <Divider orientation="left" style={{ fontSize: 8 }}>
+                                                Pengiriman yang didukung
                     </Divider>
-                                        <List
-                                            dataSource={kurirList}
-                                            renderItem={(item) => (
-                                                <img src={item.imgSource} style={{ height: 48, maxWidth: '100%' }} title={item.name} />
-                                            )}
-                                        />
-                                    </div>
-                                )}
-                            />
-                        </Card>
+                                            <List
+                                                dataSource={kurirList}
+                                                renderItem={(item) => (
+                                                    <img src={item.imgSource} style={{ height: 48, maxWidth: '100%' }} title={item.name} />
+                                                )}
+                                            />
+                                        </div>
+                                    )}
+                                />
+                            </Card>
+                        </Skeleton>
                     </Col>
                 </Row>
             </Layout>
