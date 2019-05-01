@@ -134,11 +134,18 @@ class AppChildren extends PureComponent {
 			},
 			visible: false,
 			getData: true,
-			username: undefined
+            username: undefined,
+            dataSource: []
 		};
 	}
 
-
+    handleSearch = (value) => {
+        this.setState({
+          dataSource: !value ? [] : [
+            value
+          ],
+        });
+      }
 	componentWillMount = async () => {
 		this.props.context.checkLogin();
 
