@@ -2,9 +2,10 @@
 
 namespace App\Console;
 
+use App\BarangLelang;
+use App\Transaksi;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Illuminate\Support\Facades\DB;
 
 class Kernel extends ConsoleKernel
 {
@@ -29,9 +30,23 @@ class Kernel extends ConsoleKernel
         //          ->hourly();
         $schedule->call(function () {
             //
-            DB::table('testCron')->insert([
-                'temp' => 'temp',
-            ]);
+            $barangLelang = BarangLelang::whereNotNull('waktu_akhir')
+                ->get(['id', 'waktu_akhir']);
+
+            $timeExecuted = time();
+            foreach ($barangLelang as $barang) {
+
+                if (($timeExecuted - strtotime($barang->waktu_akhir)) < 60) {
+                    $penawaranMenang = end($barang->penawaran);
+
+                    $newTransaksi = new Transaksi;
+                    $newTransaksi->id_penawaran = $penawaranMenang->id;
+                    $newTransaksi->kode_unik = mt_rand(101, 999);
+                    $newTransaksi->username_penggguna = $penawaranMenang->username_pengguna;
+
+                    $newTransaksi->save();
+                }
+            }
         })->everyMinute();
     }
 

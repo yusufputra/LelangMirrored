@@ -13,14 +13,20 @@ class Transaksi extends Model
         'id_barang',
         'kode_unik',
         'username_pengguna',
-        'status'
+        'status',
     ];
 
-    public function pengguna() {
+    protected $with = [
+        'barang',
+    ];
+
+    public function pengguna()
+    {
         return $this->belongsTo('App\Pengguna', 'username_pengguna', 'username');
     }
 
-    public function barang() {
+    public function barang()
+    {
         return $this->belongsTo('App\BarangLelang', 'id_barang', 'id');
     }
 }

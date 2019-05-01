@@ -20,7 +20,7 @@ class AuctionController extends Controller
                 'bukaan_harga' => 'numeric|nullable',
                 'kelipatan' => 'numeric|nullable',
                 'waktu_mulai' => 'required|after:now',
-                'waktu_akhir' => 'after:waktu_mulai|nullable',
+                'waktu_akhir' => 'required|after:waktu_mulai|nullable',
                 'photo.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ]);
 
@@ -391,30 +391,39 @@ class AuctionController extends Controller
                         'penawaran' => 'required|numeric|min:0',
                     ]);
                     $penawaran = $validatedData['penawaran'];
-                    if ($penawaran > $barangLelang->max_bid) {
-                        if ($barangLelang->kelipatan && $penawaran % $barangLelang->kelipatan != 0) {
+
+                    $bidTime = time();
+                    if ($bidTime >= strtotime($barangLelang->waktu_mulai) && $bidTime <= strtotime($barangLelang->waktu_akhir)) {
+                        if ($penawaran > $barangLelang->max_bid) {
+                            if ($barangLelang->kelipatan && $penawaran % $barangLelang->kelipatan != 0) {
+                                return response()->json([
+                                    'status' => false,
+                                    'message' => 'Kelipatan penawaran tidak sesuai',
+                                ], 422);
+                            }
+
+                            $penawaranLelang = new PenawaranLelang;
+                            $penawaranLelang->id_barang = $id;
+                            $penawaranLelang->harga_penawaran = $penawaran;
+                            $penawaranLelang->username_pengguna = $request->user->username;
+                            $penawaranLelang->save();
+
+                            return response()->json([
+                                'status' => true,
+                                'message' => 'Penawaran barang berhasil dimasukkan',
+                            ]);
+                        } else {
                             return response()->json([
                                 'status' => false,
-                                'message' => 'Kelipatan penawaran tidak sesuai',
-                            ], 422);
+                                'message' => 'Harga penawaran tidak valid',
+                            ], 400);
                         }
-
-                        $penawaranLelang = new PenawaranLelang;
-                        $penawaranLelang->id_barang = $id;
-                        $penawaranLelang->harga_penawaran = $penawaran;
-                        $penawaranLelang->username_pengguna = $request->user->username;
-                        $penawaranLelang->save();
-
-                        return response()->json([
-                            'status' => true,
-                            'message' => 'Penawaran barang berhasil dimasukkan',
-                        ]);
                     } else {
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Harga penawaran tidak valid',
-                        ], 400);
-                    }
+						return response()->json([
+							'status' => false,
+							'message' => 'Waktu penawaran tidak valid',
+						], 400);
+					}
                 } else {
                     return response()->json([
                         'status' => false,

@@ -11,7 +11,7 @@ class PenawaranLelang extends Model
 
     protected $fillable = [
         'username_pengguna',
-        'id_barang',
+        'id_penawaran',
         'harga_penawaran',
         'created_at'
 	];
