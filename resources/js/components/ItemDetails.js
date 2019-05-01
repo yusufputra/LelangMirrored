@@ -91,7 +91,8 @@ export default class ItemDetails extends Component {
         foto: [],
         dataToko: [],
         penawaran: [],
-        user: []
+        user: [],
+        loggedin:true
     }
     handleSubmit = (value) => {
         this.setState({ load: true })
@@ -153,6 +154,10 @@ export default class ItemDetails extends Component {
                 this.setState({ user: ress.data.data });
                 console.log(this.state.user)
                 this.setState({ load: false })
+            }).catch(err=>{
+                this.setState({ load: false })
+                console.log(err);
+                this.setState({ loggedin: false })
             })
 
     }
@@ -210,12 +215,12 @@ export default class ItemDetails extends Component {
         Axios.post('/api/barangdetail/' + id + '/komentar', {
             'isi': this.state.value
         }, {
-            headers: {
-                Authorization: localStorage.token
-            }
-            }).then(ress=>{
+                headers: {
+                    Authorization: localStorage.token
+                }
+            }).then(ress => {
                 console.log(ress);
-            }).catch(err=>{
+            }).catch(err => {
                 alert(err);
             })
         setTimeout(() => {
@@ -271,6 +276,13 @@ export default class ItemDetails extends Component {
     render() {
         const { comments, submitting, value, chat } = this.state;
         const { Meta } = Card;
+        const start = (this.state.barang.waktu_mulai == undefined) ? '' : this.state.barang.waktu_mulai;
+        const finish = (this.state.barang.waktu_akhir == undefined) ? '' : this.state.barang.waktu_akhir;
+        // let t = now.split(/[- :]/);
+        // let d = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5]));
+        let startDate = Date.parse(start);
+        let finishDate = Date.parse(finish);
+        console.log(this.state.load +""+ (startDate <= Date.now()) +""+ (finishDate >= Date.now()));
         return (
             <Layout>
                 <Breadcrumb separator=">" style={{ padding: "16px 0" }}>
@@ -350,7 +362,7 @@ export default class ItemDetails extends Component {
                                                 addonBefore="Rp"
                                                 enterButton="Tawar Barang"
                                                 size="large"
-                                                disabled={this.state.load}
+                                                disabled={this.state.load ||( (startDate <= Date.now()) && (finishDate >= Date.now()) && !this.state.loggedin)}
                                                 onSearch={(value) => this.handleSubmit(value)}
                                             />
                                             {this.state.load && <Spin />}
