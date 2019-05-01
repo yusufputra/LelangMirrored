@@ -32,6 +32,7 @@ export default class LandingPage extends Component {
     componentWillMount() {
         axios.get('/api/hotItem')
             .then(ress => {
+                console.log(ress.data)
                 const data = [];
                 for (let index = 0; index < ress.data.length; index++) {
                     const element = ress.data[index];
@@ -39,6 +40,7 @@ export default class LandingPage extends Component {
                         id: element.id,
                         title: element.nama_barang,
                         latestBidPrice: element.max_bid,
+                        image: (element.foto.length == 0) ? "http://sifatit.com/wp-content/uploads/2012/07/dummy-500x337.jpg" : element.foto[0]
                     })
                 }
                 this.setState({ hotItem: data });
@@ -52,6 +54,7 @@ export default class LandingPage extends Component {
                         id: element.id,
                         title: element.nama_barang,
                         latestBidPrice: element.max_bid,
+                        image: (element.foto.length == 0) ? "http://sifatit.com/wp-content/uploads/2012/07/dummy-500x337.jpg" : element.foto[0]
                     })
                 }
                 this.setState({ rekomItem: data });
@@ -80,7 +83,7 @@ export default class LandingPage extends Component {
                             <List.Item>
                                 <Card
                                     hoverable
-                                    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                                    cover={<img alt="example" src={item.image} />}
                                 >
                                     <Card.Meta
                                         title={item.title}
@@ -100,7 +103,7 @@ export default class LandingPage extends Component {
                             <List.Item>
                                 <Card
                                     hoverable
-                                    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+                                    cover={<img alt="example" src={item.image} />}
                                 >
                                     <Card.Meta
                                         title={item.title}

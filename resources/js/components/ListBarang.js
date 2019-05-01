@@ -46,6 +46,7 @@ export default class ListBarang extends React.PureComponent {
                 id: element.id,
                 title: element.nama_barang,
                 latestBidPrice : element.max_bid,
+                image: (element.foto.length == 0) ? "http://sifatit.com/wp-content/uploads/2012/07/dummy-500x337.jpg" : element.foto[0]
             })
         }
         console.log(data)
@@ -63,7 +64,7 @@ export default class ListBarang extends React.PureComponent {
 						<List.Item>
 							<Card
 								hoverable
-								cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+								cover={<img alt="example" src={item.image} />}
 							>
 								<Card.Meta
 									title={item.title}
