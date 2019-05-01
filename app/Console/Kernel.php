@@ -31,22 +31,27 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             //
             $barangLelang = BarangLelang::whereNotNull('waktu_akhir')
-                ->get(['id', 'waktu_akhir']);
+                ->has('transaksi', '=', 0)->get(['id', 'waktu_akhir']);
 
             $timeExecuted = time();
             foreach ($barangLelang as $barang) {
 
-                if (($timeExecuted - strtotime($barang->waktu_akhir)) < 60) {
-                    $penawaranMenang = end($barang->penawaran);
+                $time_diff = $timeExecuted - strtotime($barang->waktu_akhir);
+                if ($time_diff > 0 && $time_diff <= 60) {
+                    $penawaranMenang = $barang->penawaran[count($barang->penawaran) - 1];
+                    error_log($penawaranMenang);
 
                     $newTransaksi = new Transaksi;
                     $newTransaksi->id_barang = $barang->id;
                     $newTransaksi->id_penawaran = $penawaranMenang->id;
                     $newTransaksi->kode_unik = mt_rand(101, 999);
-                    $newTransaksi->username_penggguna = $penawaranMenang->username_pengguna;
+                    $newTransaksi->username_pengguna = $penawaranMenang->username_pengguna;
 
                     $newTransaksi->save();
+                    error_log('masuk pak eko');
                 }
+
+                error_log('halo');
             }
         })->everyMinute();
     }
