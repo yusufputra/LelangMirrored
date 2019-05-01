@@ -16,7 +16,9 @@ class AlamatPengiriman extends Model
         'nama_jalan',
         'kelurahan',
         'kode_pos'
-    ];
+	];
+	
+	public $timestamps = false;
 
     public function pengguna()
     {

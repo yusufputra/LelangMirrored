@@ -30,7 +30,13 @@ Route::group(['middleware' => ['checkjwt']], function () {
     Route::get('pengguna', 'UserController@index');
     Route::post('perbarui-profil', 'UserController@updateProfile');
     Route::post('unggah-foto-profil', 'UserController@uploadPhoto');
-    Route::get('histori-transaksi-pengguna', 'TransactionController@getUserTransactionHistory');
+	Route::get('histori-transaksi-pengguna', 'TransactionController@getUserTransactionHistory');
+	
+	// Alamat Pengiriman
+	Route::post('tambah-alamat-pengiriman', 'UserController@addAddress');
+	Route::get('alamat-pengiriman', 'UserController@getUserAddress');
+	Route::post('ubah-alamat-pengiriman/{id}', 'UserController@updateAddress');
+	Route::post('hapus-alamat-pengiriman/{id}', 'UserController@deleteAddress');
 
     Route::post('daftar-toko', 'ShopController@createShop');
 
