@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\BarangLelang;
+use App\PenawaranLelang;
 use Illuminate\Http\Request;
 
 class AuctionController extends Controller
@@ -12,43 +13,42 @@ class AuctionController extends Controller
     public function createAuction(Request $request)
     {
         try {
-            if ($request['slow_bid']) {
-                $validatedData = $request->validate([
-                    'nama_barang' => 'required|max:255',
-                    'deskripsi' => 'required|max:20',
-                    'kategori' => 'required|max:255',
-                    'bukaan_harga' => 'sometimes|numeric',
-                    'kelipatan' => 'sometimes|numeric',
-                    '' => '',
-                ]);
-            } else {
-                $validatedData = $request->validate([
-                    'nama_barang' => 'required|max:255',
-                    'deskripsi' => 'required|max:20',
-                    'kategori' => 'required|max:255',
-                    'bukaan_harga' => 'sometimes|numeric',
-                    'kelipatan' => 'sometimes|numeric',
-                ]);
-            }
+            $validatedData = $request->validate([
+                'nama_barang' => 'required|max:255',
+                'deskripsi' => 'string|nullable',
+                'kategori' => 'required|max:255',
+                'bukaan_harga' => 'numeric|nullable',
+                'kelipatan' => 'numeric|nullable',
+                'waktu_mulai' => 'required|after:now',
+                'waktu_akhir' => 'after:waktu_mulai|nullable',
+                'photo.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
 
             $barang_lelang = new BarangLelang;
             $barang_lelang->nama_barang = $validatedData['nama_barang'];
             $barang_lelang->deskripsi = $validatedData['deskripsi'];
             $barang_lelang->kategori = $validatedData['kategori'];
+            $barang_lelang->bukaan_harga = $validatedData['bukaan_harga'] ?? 0;
+            $barang_lelang->waktu_mulai = $validatedData['waktu_mulai'];
 
-            if (isset($request['bukaan_harga'])) {
-                $barang_lelang->bukaan_harga = $validatedData['bukaan_harga'];
-            }
-
-            if (isset($request['kelipatan'])) {
+            if (isset($validatedData['kelipatan'])) {
                 $barang_lelang->kelipatan = $validatedData['kelipatan'];
             }
 
-            if ($request['slow_bid']) {
+            if (isset($validatedData['waktu_akhir'])) {
                 $barang_lelang->waktu_akhir = $validatedData['waktu_akhir'];
             }
 
+            $barang_lelang->jumlah_dilihat = 0;
+            $barang_lelang->id_toko = $request->toko->id;
             $barang_lelang->save();
+
+            if ($request->hasfile('photo')) {
+                foreach ($request->file('photo') as $photo) {
+                    $photo->move(public_path() . '/uploads/auction_photo/',
+                        $barang_lelang->id . '_' . uniqid() . '.' . $photo->getClientOriginalExtension());
+                }
+            }
 
             return response()->json([
                 'status' => true,
@@ -61,7 +61,7 @@ class AuctionController extends Controller
                 if (isset($e->errorInfo[1])) {
                     switch ($e->errorInfo[1]) {
                         case 1216:
-                            $errorData['message'] = 'Data pengguna tidak valid';
+                            $errorData['message'] = 'Data toko pengguna tidak valid';
                             break;
                         default:
                             $errorData['message'] = 'Terjadi kesalahan pada database';
@@ -76,7 +76,94 @@ class AuctionController extends Controller
             return response()->json($errorData, $e->status ?? 500);
         }
     }
+    public function getShopAuction($idToko)
+    {
+        try {
+            $barangLelang = BarangLelang::where('id_toko', $idToko)->get();
 
+            if ($barangLelang) {
+                return response()->json($barangLelang);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, $e->status ?? 500);
+        }
+    }
+    public function getRekomen()
+    {
+        try {
+            $barangLelang = BarangLelang::orderBy('id','DESC')
+                            ->limit(10)
+                            ->get();
+
+            if ($barangLelang) {
+                return response()->json($barangLelang);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, $e->status ?? 500);
+        }
+    }
+    public function getHotItem()
+    {
+        try {
+            $barangLelang = BarangLelang::orderBy('jumlah_dilihat','DESC')
+                            ->limit(10)
+                            ->get();
+
+            if ($barangLelang) {
+                return response()->json($barangLelang);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($errorData, $e->status ?? 500);
+        }
+    }
     public function readAuction($id)
     {
         try {
@@ -112,31 +199,39 @@ class AuctionController extends Controller
         }
     }
 
-    public function updateAuction(Request $request)
+    public function updateAuction(Request $request, $id)
     {
         try {
             $validatedData = $request->validate([
-                'nama_toko' => 'required|max:255',
-                'no_telepon' => 'required|max:20',
-                'nama_jalan' => 'required|max:255',
-                'kelurahan' => 'required|max:100',
-                'kode_pos' => 'required|numeric',
+                'nama_barang' => 'required|max:255',
+                'deskripsi' => 'string|nullable',
+                'kategori' => 'required|max:255',
+                'bukaan_harga' => 'numeric|nullable',
+                'kelipatan' => 'numeric|nullable',
             ]);
 
-            $tokoLelang = TokoLelang::where('username_pengguna', $request['username_pengguna'])->first();
+            $barang_lelang = BarangLelang::find($id);
 
-            if ($tokoLelang) {
-                $tokoLelang->nama_toko = $validatedData['nama_toko'];
-                $tokoLelang->no_telepon = $validatedData['no_telepon'];
-                $tokoLelang->nama_jalan = $validatedData['nama_jalan'];
-                $tokoLelang->kelurahan = $validatedData['kelurahan'];
-                $tokoLelang->kode_pos = $validatedData['kode_pos'];
-                $tokoLelang->save();
+            if ($barang_lelang) {
+                if ($barangLelang->id_toko == $request->toko->id) {
+                    $barang_lelang->nama_barang = $validatedData['nama_barang'];
+                    $barang_lelang->deskripsi = $validatedData['deskripsi'];
+                    $barang_lelang->kategori = $validatedData['kategori'];
+                    $barang_lelang->bukaan_harga = $validatedData['bukaan_harga'] ?? 0;
+                    $barang_lelang->kelipatan = $validatedData['kelipatan'];
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Informasi toko berhasil dibuat',
-                ]);
+                    $barang_lelang->save();
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Informasi barang lelang berhasil diperbarui',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Anda tidak memiliki izin',
+                    ], 403);
+                }
             } else {
                 return response()->json([
                     'status' => false,
@@ -169,12 +264,19 @@ class AuctionController extends Controller
             $barangLelang = BarangLelang::find($id);
 
             if ($barangLelang) {
-                $barangLelang->delete();
+                if ($barangLelang->id_toko == $request->toko->id) {
+                    $barangLelang->delete();
 
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Toko lelang berhasil dihapus',
-                ]);
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Barang lelang berhasil dihapus',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Anda tidak memiliki izin',
+                    ], 403);
+                }
             } else {
                 return response()->json([
                     'status' => false,
@@ -201,24 +303,60 @@ class AuctionController extends Controller
     {
         try {
             $barang = BarangLelang::whereRaw("1 = 1");
-
-            // if ($request['keyword']) {
-            //     $barang->where('nama_barang', 'LIKE', '%' . $request['keyword'] . '%');
+            if ($request->get('keyword')) {
+                $barang->where('nama_barang', 'LIKE', '%' . $request->get('keyword') . '%');
+            }
+            $barang = $barang->get();
+            if ($request->get('max')) {
+                $barang = $barang->filter(function ($element) use ($request) {
+                    return $element->max_bid <= $request->get('max');
+                });
+            }
+            if ($request->get('min')) {
+                $barang = $barang->filter(function ($element) use ($request) {
+                    return $element->max_bid >= $request->get('max');
+                });
+            }
+            // if ($request->get('sortBy')) {
+            //     switch ($request->get('sortBy')) {
+            //         case 'name':
+            //             $barang->sortBy('nama_barang');
+            //             break;
+            //         case 'nameDesc':
+            //             $barang->sortByDesc('nama_barang');
+            //             break;
+            //         case 'price':
+            //             $barang->sortBy('max_bid');
+            //             break;
+            //         case 'priceDesc':
+            //             $barang->sortByDesc('max_bid');
+            //             break;
+            //         case 'latestDesc':
+            //             $barang->sortByDesc('id');
+            //             break;
+            //         default:
+            //             $barang->sortBy('id');
+            //             break;
+            //     }
             // }
-
-            // if ($request['max_price']) {
-			// 	$barang->where('');
-            // }
-
-            $barang = $barang->get()->all();
-
+            if ($request->get('perPage')) {
+                $temp = $barang;
+                $barang = array();
+                $page = $request->get('page') ?? 1;
+                for ($i = ($page - 1) * $request->get('perPage'); $i < $page * $request->get('perPage'); $i++) {
+                    if (isset($temp[$i])) {
+                        $barang[] = $temp[$i];
+                    } else {
+                        break;
+                    }
+                }
+            }
             return response()->json([
                 'status' => true,
                 'data' => $barang,
             ], 200);
         } catch (\Exception $e) {
             $errorData = ['status' => false];
-
             if (isset($e->errorInfo[1])) {
                 switch ($e->errorInfo[1]) {
                     default:
@@ -229,6 +367,74 @@ class AuctionController extends Controller
                 $errorData['message'] = 'Terjadi kesalahan pada server';
             }
             return response()->json($e->getMessage(), $e->status ?? 500);
+        }
+    }
+
+    public function placeBid(Request $request, $id)
+    {
+        try {
+            $barangLelang = BarangLelang::find($id);
+
+            if ($barangLelang) {
+                if ($request->get('penawaran')) {
+                    $validatedData = $request->validate([
+                        'penawaran' => 'required|numeric|min:0',
+                    ]);
+                    $penawaran = $validatedData['penawaran'];
+                    if ($penawaran > $barangLelang->max_bid) {
+                        if ($barangLelang->kelipatan && $penawaran % $barangLelang->kelipatan != 0) {
+                            return response()->json([
+                                'status' => false,
+                                'message' => 'Kelipatan penawaran tidak sesuai',
+                            ], 422);
+                        }
+
+                        $penawaranLelang = new PenawaranLelang;
+                        $penawaranLelang->id_barang = $id;
+                        $penawaranLelang->harga_penawaran = $penawaran;
+                        $penawaranLelang->username_pengguna = $request->user->username;
+                        $penawaranLelang->save();
+
+                        return response()->json([
+                            'status' => true,
+                            'message' => 'Penawaran barang berhasil dimasukkan',
+                        ]);
+                    } else {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Harga penawaran tidak valid',
+                        ], 400);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Input data tidak valid',
+                    ], 422);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (empty($e->status)) {
+                if (isset($e->errorInfo[1])) {
+                    switch ($e->errorInfo[1]) {
+                        default:
+                            $errorData['message'] = 'Terjadi kesalahan pada database';
+                            break;
+                    }
+                } else {
+                    $errorData['message'] = 'Terjadi kesalahan pada server';
+                }
+            } else {
+                $errorData['message'] = 'Input data tidak valid';
+            }
+
+            return response()->json($errorData, $e->status ?? 500);
         }
     }
 }

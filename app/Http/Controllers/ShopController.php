@@ -26,7 +26,7 @@ class ShopController extends Controller
                 'nama_jalan' => $validatedData['nama_jalan'],
                 'kelurahan' => $validatedData['kelurahan'],
                 'kode_pos' => $validatedData['kode_pos'],
-                'username_pengguna' => $request['username_pengguna'],
+                'username_pengguna' => $request->user->username,
             ]);
 
             return response()->json([
@@ -40,10 +40,12 @@ class ShopController extends Controller
                 if (isset($e->errorInfo[1])) {
                     switch ($e->errorInfo[1]) {
                         case 1062:
-                            $errorData['message'] = 'Anda sudah memiliki toko lelang';
+							$errorData['message'] = 'Anda sudah memiliki toko lelang';
+							$e->status = 400;
                             break;
                         case 1216:
-                            $errorData['message'] = 'Data pengguna tidak valid';
+							$errorData['message'] = 'Data pengguna tidak valid';
+							$e->status = 400;							
                             break;
                         default:
                             $errorData['message'] = 'Terjadi kesalahan pada database';
@@ -67,7 +69,7 @@ class ShopController extends Controller
             if ($tokoLelang) {
                 return response()->json([
                     'status' => true,
-                    'data' => $tokoLelang,
+					'data' => $tokoLelang,
                 ]);
             } else {
                 return response()->json([
@@ -85,7 +87,7 @@ class ShopController extends Controller
                         break;
                 }
             } else {
-                $errorData['message'] = 'Terjadi kesalahan pada server';
+                $errorData['message'] = 'Terjadi kesalahan pada server'.$e;
             }
             return response()->json($errorData, $e->status ?? 500);
         }
@@ -102,7 +104,7 @@ class ShopController extends Controller
                 'kode_pos' => 'required|numeric',
             ]);
 
-            $tokoLelang = TokoLelang::where('username_pengguna', $request['username_pengguna'])->first();
+            $tokoLelang = TokoLelang::where('username_pengguna', $request->user->username)->first();
 
             if ($tokoLelang) {
                 $tokoLelang->nama_toko = $validatedData['nama_toko'];
@@ -114,7 +116,7 @@ class ShopController extends Controller
 
                 return response()->json([
                     'status' => true,
-                    'message' => 'Informasi toko berhasil dibuat',
+                    'message' => 'Informasi toko berhasil diperbarui',
                 ]);
             } else {
                 return response()->json([
@@ -145,7 +147,7 @@ class ShopController extends Controller
     public function deleteShop()
     {
         try {
-            $tokoLelang = TokoLelang::where('username_pengguna', $request['username_pengguna'])->first();
+            $tokoLelang = TokoLelang::where('username_pengguna', $request->user->username)->first();
 
             if ($tokoLelang) {
                 $tokoLelang->delete();
@@ -174,5 +176,31 @@ class ShopController extends Controller
             }
             return response()->json($errorData, $e->status ?? 500);
         }
+    }
+
+    public function uploadPhoto(Request $request)
+    {
+        if ($request->hasFile('photo')) {
+            $photo = $request->file('photo');
+            if ($photo->isValid()) {
+                if (stripos($photo->getMimeType(), 'image') !== false) {
+                    $photo->move(public_path() . '/uploads/shop_photo/',
+                        $request->user->username . '.' . $photo->getClientOriginalExtension());
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Foto toko berhasil diperbarui',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Format berkas tidak sesuai',
+                    ], 400);
+                }
+            }
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'Pengunggahan foto gagal',
+        ], 400);
     }
 }
