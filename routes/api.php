@@ -24,6 +24,7 @@ Route::get('cari-barang-lelang', 'AuctionController@searchAuction');
 Route::get('barang/{idToko}', 'AuctionController@getShopAuction');
 Route::get('hotItem', 'AuctionController@getHotItem');
 Route::get('rekomen', 'AuctionController@getRekomen');
+Route::get('barangdetail/{id}', 'AuctionController@readAuction');
 // ShopController
 Route::get('toko/{id}', 'ShopController@readShop');
 
