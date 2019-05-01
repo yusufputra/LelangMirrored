@@ -303,10 +303,33 @@ class AuctionController extends Controller
     public function searchAuction(Request $request)
     {
         try {
-            $barang = BarangLelang::whereRaw("1 = 1");
+            $barang = BarangLelang::has('transaksi', '=', 0);
 
             if ($request->get('keyword')) {
                 $barang->where('nama_barang', 'LIKE', '%' . $request->get('keyword') . '%');
+            }
+
+            if ($request->get('sortBy')) {
+                switch ($request->get('sortBy')) {
+                    case 'name':
+                        $barang->orderBy('nama_barang');
+                        break;
+                    case 'nameDesc':
+                        $barang->orderByDesc('nama_barang');
+                        break;
+                    case 'latestDesc':
+                        $barang->orderBy('id');
+                        break;
+                    case 'latest':
+                        $barang->orderByDesc('id');
+                        break;
+                    case 'popularity':
+                        $barang->orderByDesc('jumlah_dilihat');
+                        break;
+                    case 'popularityDesc':
+                        $barang->orderBy('jumlah_dilihat');
+                        break;
+                }
             }
 
             $barang = $barang->get();
@@ -324,28 +347,20 @@ class AuctionController extends Controller
 
             $dataCount = count($barang);
 
-            // if ($request->get('sortBy')) {
-            //     switch ($request->get('sortBy')) {
-            //         case 'name':
-            //             $barang->sortBy('nama_barang');
-            //             break;
-            //         case 'nameDesc':
-            //             $barang->sortByDesc('nama_barang');
-            //             break;
-            //         case 'price':
-            //             $barang->sortBy('max_bid');
-            //             break;
-            //         case 'priceDesc':
-            //             $barang->sortByDesc('max_bid');
-            //             break;
-            //         case 'latestDesc':
-            //             $barang->sortByDesc('id');
-            //             break;
-            //         default:
-            //             $barang->sortBy('id');
-            //             break;
-            //     }
-            // }
+            if ($request->get('sortBy')) {
+                $barang = collect($barang);
+
+                switch ($request->get('sortBy')) {
+                    case 'price':
+                        $barang = $barang->sortBy('max_bid');
+                        break;
+                    case 'priceDesc':
+                        $barang = $barang->sortByDesc('max_bid');
+                        break;
+                }
+
+                $barang = $barang->toArray();
+            }
 
             if ($request->get('perPage')) {
                 $temp = $barang;
