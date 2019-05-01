@@ -394,7 +394,7 @@ class AuctionController extends Controller
 
                     $bidTime = time();
                     if ($bidTime >= strtotime($barangLelang->waktu_mulai) && $bidTime <= strtotime($barangLelang->waktu_akhir)) {
-                        if ($penawaran > $barangLelang->max_bid) {
+                        if ($penawaran > $barangLelang->max_bid && $penawaran > $barangLelang->bukaan_harga) {
                             if ($barangLelang->kelipatan && $penawaran % $barangLelang->kelipatan != 0) {
                                 return response()->json([
                                     'status' => false,

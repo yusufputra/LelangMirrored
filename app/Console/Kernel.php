@@ -40,6 +40,7 @@ class Kernel extends ConsoleKernel
                     $penawaranMenang = end($barang->penawaran);
 
                     $newTransaksi = new Transaksi;
+                    $newTransaksi->id_barang = $barang->id;
                     $newTransaksi->id_penawaran = $penawaranMenang->id;
                     $newTransaksi->kode_unik = mt_rand(101, 999);
                     $newTransaksi->username_penggguna = $penawaranMenang->username_pengguna;

@@ -11,6 +11,7 @@ class Transaksi extends Model
 
     protected $fillable = [
         'id_barang',
+        'id_penawaran',
         'kode_unik',
         'username_pengguna',
         'status',
@@ -28,5 +29,9 @@ class Transaksi extends Model
     public function barang()
     {
         return $this->belongsTo('App\BarangLelang', 'id_barang', 'id');
-    }
+	}
+	
+	public function penawaran() {
+		return $this->belongsTo('App\PenawaranLelang', 'id_penawaran', 'id');
+	}
 }

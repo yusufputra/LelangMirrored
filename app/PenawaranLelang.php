@@ -11,11 +11,11 @@ class PenawaranLelang extends Model
 
     protected $fillable = [
         'username_pengguna',
-        'id_penawaran',
+        'id_barang',
         'harga_penawaran',
-        'created_at'
-	];
-	
+        'created_at',
+    ];
+
     public $timestamps = false;
 
     public function pengguna()
@@ -26,5 +26,10 @@ class PenawaranLelang extends Model
     public function barang()
     {
         return $this->belongsTo('App\BarangLelang', 'id_barang', 'id');
+    }
+
+    public function transaksi()
+    {
+        return $this->hasOne('App\Transaksi', 'id_penawaran', 'id');
     }
 }
