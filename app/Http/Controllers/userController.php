@@ -180,21 +180,18 @@ class UserController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'username' => 'required|alpha_dash',
                 'email' => 'required',
                 'nama' => 'required',
-                'password' => 'required',
                 'tanggal_lahir' => 'required',
             ]);
 
-            $project = Pengguna::where('username', $validatedData['username'])->first();
+            $project = Pengguna::where('username', $request->user->username)->first();
 
             if ($project) {
-                $project->username = $validatedData['username'];
                 $project->email = $validatedData['email'];
                 $project->nama = $validatedData['nama'];
-                $project->password = bcrypt($validatedData['password']);
-                $project->tanggal_lahir = $validatedData['tanggal_lahir'];
+				$project->tanggal_lahir = $validatedData['tanggal_lahir'];
+				
                 $project->save();
                 return response()->json([
                     'status' => true,
@@ -204,7 +201,54 @@ class UserController extends Controller
                 return response()->json([
                     'status' => false,
                     'message' => 'Pengguna tidak ditemukan',
-                ], 400);
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (isset($e->errorInfo[1])) {
+                switch ($e->errorInfo[1]) {
+                    default:
+                        $errorData['message'] = 'Terjadi kesalahan pada database';
+                        break;
+                }
+            } else {
+                $errorData['message'] = 'Terjadi kesalahan pada server';
+            }
+            return response()->json($e->getMessage(), $e->status ?? 500);
+        }
+    }
+
+    public function changePassword(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'old_password' => 'required',
+                'new_password' => 'required',
+            ]);
+
+            $project = Pengguna::where('username', $request->user->username)->first();
+
+            if ($project) {
+                if (Hash::check($validatedData['old_password'], $project->password)) {
+                    $project->password = $validatedData['new_password'];
+
+                    $project->save();
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Penggantian password berhasil',
+                    ], 200);
+                } else {
+					return response()->json([
+						'status' => false,
+						'message' => 'Password lama tidak sesuai',
+					], 400);
+				}
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pengguna tidak ditemukan',
+                ], 404);
             }
         } catch (\Exception $e) {
             $errorData = ['status' => false];

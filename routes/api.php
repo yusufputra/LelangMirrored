@@ -24,6 +24,7 @@ Route::get('cari-barang-lelang', 'AuctionController@searchAuction');
 Route::get('barang/{idToko}', 'AuctionController@getShopAuction');
 Route::get('hotItem', 'AuctionController@getHotItem');
 Route::get('rekomen', 'AuctionController@getRekomen');
+Route::get('barangdetail/{id}', 'AuctionController@readAuction');
 // ShopController
 Route::get('toko/{id}', 'ShopController@readShop');
 
@@ -31,7 +32,8 @@ Route::get('toko/{id}', 'ShopController@readShop');
 // need to authorized
 Route::group(['middleware' => ['checkjwt']], function () {
     Route::get('pengguna', 'UserController@index');
-    Route::post('perbarui-profil', 'UserController@updateProfile');
+	Route::post('perbarui-profil', 'UserController@updateProfile');
+    Route::post('ganti-password', 'UserController@changePassword');	
     Route::post('unggah-foto-profil', 'UserController@uploadPhoto');
 	Route::get('histori-transaksi-pengguna', 'TransactionController@getUserTransactionHistory');
 	

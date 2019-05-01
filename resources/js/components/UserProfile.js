@@ -294,6 +294,7 @@ export default class UserProfile extends PureComponent {
             getData: false
 
         });
+        return (data.data);
         console.log(this.state);
     }
 
