@@ -107,9 +107,9 @@ class AuctionController extends Controller
     public function getRekomen()
     {
         try {
-            $barangLelang = BarangLelang::orderBy('id','DESC')
-                            ->limit(10)
-                            ->get();
+            $barangLelang = BarangLelang::orderBy('id', 'DESC')
+                ->limit(10)
+                ->get();
 
             if ($barangLelang) {
                 return response()->json($barangLelang);
@@ -134,12 +134,12 @@ class AuctionController extends Controller
             return response()->json($errorData, $e->status ?? 500);
         }
     }
+
     public function getHotItem()
     {
         try {
-            $barangLelang = BarangLelang::orderBy('jumlah_dilihat','DESC')
-                            ->limit(10)
-                            ->get();
+            $barangLelang = BarangLelang::orderBy('jumlah_dilihat', 'DESC')
+                ->limit(10)->get();
 
             if ($barangLelang) {
                 return response()->json($barangLelang);
@@ -164,6 +164,7 @@ class AuctionController extends Controller
             return response()->json($errorData, $e->status ?? 500);
         }
     }
+
     public function readAuction($id)
     {
         try {
@@ -303,10 +304,13 @@ class AuctionController extends Controller
     {
         try {
             $barang = BarangLelang::whereRaw("1 = 1");
+
             if ($request->get('keyword')) {
                 $barang->where('nama_barang', 'LIKE', '%' . $request->get('keyword') . '%');
             }
+
             $barang = $barang->get();
+
             if ($request->get('max')) {
                 $barang = $barang->filter(function ($element) use ($request) {
                     return $element->max_bid <= $request->get('max');
@@ -317,6 +321,9 @@ class AuctionController extends Controller
                     return $element->max_bid >= $request->get('max');
                 });
             }
+
+            $dataCount = count($barang);
+
             // if ($request->get('sortBy')) {
             //     switch ($request->get('sortBy')) {
             //         case 'name':
@@ -339,6 +346,7 @@ class AuctionController extends Controller
             //             break;
             //     }
             // }
+
             if ($request->get('perPage')) {
                 $temp = $barang;
                 $barang = array();
@@ -351,9 +359,11 @@ class AuctionController extends Controller
                     }
                 }
             }
+
             return response()->json([
                 'status' => true,
                 'data' => $barang,
+                'dataCount' => $dataCount,
             ], 200);
         } catch (\Exception $e) {
             $errorData = ['status' => false];
