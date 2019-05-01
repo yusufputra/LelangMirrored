@@ -47,31 +47,31 @@ const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 
 
-const dataSource = [{
-	title: '话题',
-	children: [{
-		title: 'AntDesign',
-		count: 10000,
-	}, {
-		title: 'AntDesign UI',
-		count: 10600,
-	}],
-}, {
-	title: '问题',
-	children: [{
-		title: 'AntDesign UI 有多好',
-		count: 60100,
-	}, {
-		title: 'AntDesign 是啥',
-		count: 30010,
-	}],
-}, {
-	title: '文章',
-	children: [{
-		title: 'AntDesign 是一个设计语言',
-		count: 100000,
-	}],
-}];
+// const dataSource = [{
+//     title: '话题',
+//     children: [{
+//         title: 'AntDesign',
+//         count: 10000,
+//     }, {
+//         title: 'AntDesign UI',
+//         count: 10600,
+//     }],
+// }, {
+//     title: '问题',
+//     children: [{
+//         title: 'AntDesign UI 有多好',
+//         count: 60100,
+//     }, {
+//         title: 'AntDesign 是啥',
+//         count: 30010,
+//     }],
+// }, {
+//     title: '文章',
+//     children: [{
+//         title: 'AntDesign 是一个设计语言',
+//         count: 100000,
+//     }],
+// }];
 
 function renderTitle(title) {
 	return (
@@ -88,29 +88,29 @@ function renderTitle(title) {
 	);
 }
 
-const options = dataSource.map(group => (
-	<OptGroup
-		key={group.title}
-		label={renderTitle(group.title)}
-	>
-		{group.children.map(opt => (
-			<Option key={opt.title} value={opt.title}>
-				{opt.title}
-				<span className="certain-search-item-count">{opt.count} 人 关注</span>
-			</Option>
-		))}
-	</OptGroup>
-)).concat([
-	<Option disabled key="all" className="show-all">
-		<a
-			href="https://www.google.com/search?q=antd"
-			target="_blank"
-			rel="noopener noreferrer"
-		>
-			查看所有结果
-	  </a>
-	</Option>,
-]);
+// const options = dataSource.map(group => (
+//     <OptGroup
+//         key={group.title}
+//         label={renderTitle(group.title)}
+//     >
+//         {group.children.map(opt => (
+//             <Option key={opt.title} value={opt.title}>
+//                 {opt.title}
+//                 <span className="certain-search-item-count">{opt.count} 人 关注</span>
+//             </Option>
+//         ))}
+//     </OptGroup>
+// )).concat([
+//     <Option disabled key="all" className="show-all">
+//         <a
+//             href="https://www.google.com/search?q=antd"
+//             target="_blank"
+//             rel="noopener noreferrer"
+//         >
+//             查看所有结果
+// 	  </a>
+//     </Option>,
+// ]);
 
 function App() {
 	return (
@@ -132,19 +132,35 @@ class AppChildren extends PureComponent {
 			trigger: () => {
 				this.setState({ success: !this.state.success });
 			},
-			visible: false
+			visible: false,
+			getData: true,
+			username: undefined
 		};
 	}
 
 
-	componentWillMount() {
+	componentWillMount = async () => {
 		this.props.context.checkLogin();
+
+	}
+	async componentDidMount() {
+		const token = localStorage.token;
+		const data = await axios.get('/api/pengguna', { headers: { Authorization: token } });
+		this.setState({
+			username: data.data.data.username,
+			getData: false,
+		});
 	}
 
 	showModal = () => {
 		this.setState({
 			visible: true,
 		});
+	}
+
+	logOut = () => {
+		localStorage.clear();
+		window.location.replace('/');
 	}
 
 	handleCancel = (e) => {
@@ -160,28 +176,34 @@ class AppChildren extends PureComponent {
 		});
 	}
 	popOver() {
+
 		return (
 			<Fragment>
-				<a >
+				<Link to='/profile'>
 					<div>
-
 						Profile
-				<Link to="/profile"></Link>
-
 					</div>
+				</Link>
+				<Link >
+					<div>
+						<a onClick={this.logOut}>
+							Logout
 				</a>
+					</div>
+				</Link>
 			</Fragment>
 		)
 	}
 
 	renderButton() {
+		console.log(this.props.context);
 		if (this.props.context.loggedIn) {
 			return (
 				<ButtonGroup style={{ float: 'right' }}>
 					<Popover content={this.popOver()} title="Hallo " trigger="hover">
-						<Button >
-							Profile
-										</Button>
+						<Button loading={this.state.getData}>
+							{this.state.username}
+						</Button>
 					</Popover>
 				</ButtonGroup>
 
@@ -205,13 +227,16 @@ class AppChildren extends PureComponent {
 		console.log('render');
 		return (
 			<AppContext.Provider value={this.state}>
-				{/* <AppContext.Consumer>
-					{(context) => console.log(context)}
-				</AppContext.Consumer> */}
+
 				<BrowserRouter>
 					<Layout>
 						<Layout.Header style={{ backgroundColor: 'white' }} className="header">
-							<div className="logo" ><img src="/LelangInCropped.png" width="100%" /></div>
+							<Link to='/'>
+								<div className="logo" >
+									<img src="/LelangInCropped.png" width="100%" />
+								</div>
+							</Link>
+
 							<Menu
 								theme={'light'}
 								mode={'horizontal'}
@@ -229,9 +254,11 @@ class AppChildren extends PureComponent {
 											dropdownStyle={{ width: 300 }}
 											size="large"
 											style={{ width: '100%' }}
-											dataSource={options}
+											dataSource={this.state.dataSource}
 											placeholder="input here"
 											optionLabelProp="value"
+											onSearch={this.handleSearch}
+											onSelect={(value) => { window.location.href = "/search?keyword=" + value }}
 										>
 											<Input suffix={<Icon type="search" className="certain-category-icon" />} />
 										</AutoComplete>

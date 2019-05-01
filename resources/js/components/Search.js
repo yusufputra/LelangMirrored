@@ -2,6 +2,7 @@ import React from 'react';
 import { Breadcrumb, Menu, Icon, Button, Row, Col, List, Card, Select, Pagination } from 'antd';
 import { Link } from 'react-router-dom';
 import ListBarang from './ListBarang';
+import axios from 'axios';
 
 const { SubMenu } = Menu;
 
@@ -12,7 +13,20 @@ function handleChange(value) {
 }
 
 export default class Search extends React.PureComponent {
-
+    constructor(props){
+        super(props);
+        this.state={
+            barangToko:[]
+        }
+    }
+    componentWillMount(){
+        const key = this.props.location.search.substring(9);
+        axios.get('/api/cari-barang-lelang?keyword=' + key)
+            .then(ress => {
+                this.setState({ barangToko: ress.data.data });
+                console.log(this.state.dataToko)
+            })
+    }
 	render() {
 		return (
 			<Col>
@@ -70,7 +84,7 @@ export default class Search extends React.PureComponent {
 						</Button>
 						</Menu>
 					</Col>
-					<ListBarang />
+					<ListBarang data={this.state.barangToko}/>
 				</Row>
 			</Col>
 		);

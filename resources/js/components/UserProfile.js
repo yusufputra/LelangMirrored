@@ -1,12 +1,14 @@
 import React, { PureComponent } from 'react'
 import {
-    Form, Input, Tooltip, Icon, Avatar, Select, Row, Col, Card, AutoComplete, List, Button, Skeleton, Tabs, Typography
+    Form, Upload, DatePicker, Icon, Avatar, message, Row, Col, Card, Spin, List, Button, Skeleton, Tabs, Typography
 } from 'antd';
 const count = 3;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
 import reqwest from 'reqwest';
 const { Paragraph } = Typography;
-
+import UserProvider, { UserContext } from '../contexts/UserProvider';
+import ReactModal from 'react-modal';
+import axios from 'axios';
 // prepare for activity list if you want.
 
 class ActivityList extends PureComponent {
@@ -18,46 +20,53 @@ class ActivityList extends PureComponent {
     }
 
     componentDidMount() {
-        this.getData((res) => {
-            this.setState({
-                initLoading: false,
-                data: res.results,
-                list: res.results,
-            });
-        });
-    }
-    
-    getData = (callback) => {
-        reqwest({
-            url: fakeDataUrl,
-            type: 'json',
-            method: 'get',
-            contentType: 'application/json',
-            success: (res) => {
-                callback(res);
-            },
-        });
+        this.getData();
     }
 
-    onLoadMore = () => {
+    // getData = (callback) => {
+    //     reqwest({
+    //         url: fakeDataUrl,
+    //         type: 'json',
+    //         method: 'get',
+    //         contentType: 'application/json',
+    //         success: (res) => {
+    //             callback(res);
+    //         },
+    //     });
+    // }
+
+    async getData() {
+        const token = localStorage.token;
+        const data = await axios.get('/api/alamat-pengiriman', { headers: { Authorization: token } });
+        console.log('terpanggil');
+        console.log(data);
         this.setState({
-            loading: true,
-            list: this.state.data.concat([...new Array(count)].map(() => ({ loading: true, name: {} }))),
-        });
-        this.getData((res) => {
-            const data = this.state.data.concat(res.results);
-            this.setState({
-                data,
-                list: data,
-                loading: false,
-            }, () => {
-                // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
-                // In real scene, you can using public method of react-virtualized:
-                // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
-                window.dispatchEvent(new Event('resize'));
-            });
-        });
+            initLoading: false,
+            data: data.data.data,
+            list: data.data.data
+        })
+        return (data);
     }
+
+    // onLoadMore = () => {
+    //     this.setState({
+    //         loading: true,
+    //         list: this.state.data.concat([...new Array(count)].map(() => ({ loading: true, name: {} }))),
+    //     });
+    //     this.getData((res) => {
+    //         const data = this.state.data.concat(res.results);
+    //         this.setState({
+    //             data,
+    //             list: data,
+    //             loading: false,
+    //         }, () => {
+    //             // Resetting window's offsetTop so as to display react-virtualized demo underfloor.
+    //             // In real scene, you can using public method of react-virtualized:
+    //             // https://stackoverflow.com/questions/46700726/how-to-use-public-method-updateposition-of-react-virtualized
+    //             window.dispatchEvent(new Event('resize'));
+    //         });
+    //     });
+    // }
 
     render() {
         const { initLoading, loading, list } = this.state;
@@ -66,7 +75,7 @@ class ActivityList extends PureComponent {
                 textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px',
             }}
             >
-                <Button onClick={this.onLoadMore}>loading more</Button>
+                <Button onClick={this.onLoadMore}>Tambah Alamat</Button>
             </div>
         ) : null;
 
@@ -118,32 +127,180 @@ class ActivityList extends PureComponent {
     }
 }
 
+
+
+
 class FormData extends PureComponent {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            getData: true,
+            email: undefined,
+            foto: undefined,
+            nama: undefined,
+            tanggal_lahir: undefined,
+            username: undefined,
+        };
+    }
+    handleCancel = (e) => {
+        this.setState({
+            visible: false,
+        });
+    }
+    async componentDidMount() {
+
+        const token = localStorage.token;
+        const data = await axios.get('/api/pengguna', { headers: { Authorization: token } });
+        this.setState({
+            email: data.data.data.email,
+            nama: data.data.data.nama,
+            tanggal_lahir: data.data.data.tanggal_lahir,
+            temp: undefined,
+            username: data.data.data.username,
+            foto: data.data.data.foto,
+            getData: false,
+            visible: false,
+            loading:false,
+        });
+    }
+
+    showDatePicker() {
+        this.setState({ visible: true });
+    }
+
+    sendData = async () => {
+        this.setState({
+            loading:true
+        })
+        const body = {
+            nama: this.state.nama,
+            email: this.state.email,
+            tanggal_lahir: this.state.tanggal_lahir
+        }
+        const data = await axios.post('/api/perbarui-profil', body, { headers: { Authorization: localStorage.token } });
+        if (data.status === 200){
+            this.setState({
+                loading:false
+            })
+            message.success(`Profile Updated`);
+        }
+        else {
+            this.setState({
+                loading:false
+            })
+            message.error(`Update Gagl`);
+
+        }
+        console.log(data);
+    }
+
     render() {
+        console.log(this.props.cotext);
+        console.log(this.props.asd);
+        if (this.state.getData) {
+            return (
+                <div>
+                    <Spin style={{ marginLeft: '50%' }} />
+                </div>
+            )
+        }
+
+
 
         return (
             <Card style={{ borderRadius: 8, boxShadow: "rgba(0, 0, 0, 0.12) 0px 2px 8px 0px" }}>
                 <div style={{ paddingTop: 0 }}>
+                    <h5>Username :</h5>
+                    <Paragraph style={{ fontSize: 20 }} >{this.state.username}</Paragraph>
                     <h5>Nama :</h5>
-                    <Paragraph style={{ fontSize: 20 }} editable={{ onChange: this.onChange }}>Adam Sulthoni Akbar</Paragraph>
-                    <h5>Alamat :</h5>
-                    <Paragraph style={{ fontSize: 20 }} editable={{ onChange: this.onChange }}>Jl Ijen No 1</Paragraph>
-                    <h5>Kode Pos :</h5>
-                    <Paragraph style={{ fontSize: 20 }} editable={{ onChange: this.onChange }}>65123</Paragraph>
-                    <h5>NomorHP :</h5>
-                    <Paragraph style={{ fontSize: 20 }} editable={{ onChange: this.onChange }}>+62823123312</Paragraph>
+                    <Paragraph style={{ fontSize: 20 }} editable={{ onChange: (val) => { this.setState({ nama: val }) } }}>{this.state.nama}</Paragraph>
+                    <h5>Email :</h5>
+                    <Paragraph style={{ fontSize: 20 }} editable={{ onChange: (val) => { this.setState({ email: val }) } }}>{this.state.email}</Paragraph>
+                    <h5>Tanggal Lahir</h5>
+                    <div style={{ flexDirection: 'row', display: 'flex' }}>
+                        <p style={{ fontSize: 20 }}>{this.state.tanggal_lahir}</p>
+                        <Icon type="edit" theme="twoTone" style={{ fontSize: 20, marginLeft: '0.4rem' }} onClick={() => this.showDatePicker()} />
+                    </div>
+                </div>
+
+                <ReactModal
+                    isOpen={this.state.visible}
+                    contentLabel="Tanggal Lahir"
+                    shouldFocusAfterRender={true}
+                    shouldCloseOnOverlayClick={false}
+                    shouldCloseOnEsc={true}
+                    shouldReturnFocusAfterClose={true}
+                    onRequestClose={this.handleCancel}
+                    style={{
+                        overlay: {
+                            backgroundColor: 'rgba(0,0,0,0.7)'
+                        },
+                        content: {
+                            borderRadius: '8px',
+                            bottom: 'auto',
+                            minHeight: '10rem',
+                            left: '50%',
+                            paddingTop: '0.4rem',
+                            paddingLeft: '2rem',
+                            paddingBottom: '2rem',
+                            paddingRight: '2rem',
+                            position: 'fixed',
+                            right: 'auto',
+                            top: '50%',
+                            transform: 'translate(-50%,-50%)',
+                            minWidth: '20rem',
+                            width: '10%',
+                            maxWidth: '20rem',
+                            height: '10%',
+                            maxHeight: '20rem'
+                        }
+                    }}
+                >
+                    <a onClick={this.handleCancel} style={{ marginLeft: '100%' }}>
+                        <Icon type="close-circle" style={{ fontSize: 25 }} />
+                    </a>
+                    <DatePicker onChange={(date, dateString) => this.setState({ temp: dateString })} />
+                    <Button onClick={() => {
+                        this.setState({ tanggal_lahir: this.state.temp })
+                        this.handleCancel()
+                    }}> Save Change </Button>
+                </ReactModal>
+                <div style={{ margin: 'auto' }}>
+                    <Button onClick={this.sendData} loading={this.state.loading}>Save Change</Button>
                 </div>
             </Card>
-        );
+        )
     }
 }
 
+const FormFilled = () => {
+
+    return (
+        <UserProvider>
+            <UserContext.Consumer>
+                {(context) => <FormData context={context} asd={'halo'} />}
+            </UserContext.Consumer>
+        </UserProvider>
+    )
+}
+
+
+
 export default class UserProfile extends PureComponent {
 
+
     state = {
+        getData: true,
+        email: undefined,
+        foto: undefined,
+        nama: undefined,
+        tanggal_lahir: undefined,
+        username: undefined,
         height: 0,
-        width: 0
+        width: 0,
+        upload: undefined,
+        uploading: false
     };
 
     constructor() {
@@ -163,6 +320,23 @@ export default class UserProfile extends PureComponent {
         });
     };
 
+    async componentDidMount() {
+
+        const token = localStorage.token;
+        const data = await axios.get('/api/pengguna', { headers: { Authorization: token } });
+        this.setState({
+            email: data.data.data.email,
+            nama: data.data.data.nama,
+            tanggal_lahir: data.data.data.tanggal_lahir,
+            username: data.data.data.username,
+            foto: data.data.data.foto,
+            getData: false
+
+        });
+        return (data.data);
+        console.log(this.state);
+    }
+
     renderTab() {
         if (this.state.width < 683 && this.state.width > 655) {
             console.log('return 683')
@@ -170,10 +344,11 @@ export default class UserProfile extends PureComponent {
                 <div>
                     <Card style={{ borderRadius: 8, boxShadow: "rgba(0, 0, 0, 0.12) 0px 2px 8px 0px" }}>
                         <Tabs defaultActiveKey="1" tabBarGutter={this.state.width / 40}>
-                            <Tabs.TabPane tab="Aktivitas Terakhir" key="1">
+
+                            <Tabs.TabPane tab="Data Diri" key="1"><FormFilled /></Tabs.TabPane>
+                            <Tabs.TabPane tab="List Alamat" key="2">
                                 <ActivityList pos={"user"} />
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab="Data Diri" key="2"><FormData /></Tabs.TabPane>
                             <Tabs.TabPane tab="Barang Lelang Yang Dimenangkan" key="3">
                                 <ActivityList pos={"lelang"} />
                             </Tabs.TabPane>
@@ -185,20 +360,17 @@ export default class UserProfile extends PureComponent {
             console.log('bellow 655');
             return (
                 <div>
-
                     <Card style={{ borderRadius: 8, boxShadow: "rgba(0, 0, 0, 0.12) 0px 2px 8px 0px" }}>
-                        <Tabs defaultActiveKey="1" >
-                            <Tabs.TabPane tab="Aktivitas Terakhir" key="1">
+                        <Tabs defaultActiveKey="1" tabBarGutter={this.state.width / 40}>
+
+                            <Tabs.TabPane tab="Data Diri" key="1"><FormFilled /></Tabs.TabPane>
+                            <Tabs.TabPane tab="List Alamat" key="2">
                                 <ActivityList pos={"user"} />
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab="Data Diri" key="2"><FormData /></Tabs.TabPane>
                             <Tabs.TabPane tab="Barang Lelang Yang Dimenangkan" key="3">
                                 <ActivityList pos={"lelang"} />
-
                             </Tabs.TabPane>
-
                         </Tabs>
-
                     </Card>
                 </div>
             );
@@ -208,11 +380,11 @@ export default class UserProfile extends PureComponent {
             return (
                 <div>
                     <Card style={{ borderRadius: 8, boxShadow: "rgba(0, 0, 0, 0.12) 0px 2px 8px 0px" }}>
-                        <Tabs defaultActiveKey="1">
-                            <Tabs.TabPane tab="Aktivitas Terakhir" key="1">
+                        <Tabs defaultActiveKey="1" tabBarGutter={this.state.width / 40}>
+                            <Tabs.TabPane tab="Data Diri" key="1"><FormFilled /></Tabs.TabPane>
+                            <Tabs.TabPane tab="List Alamat" key="2">
                                 <ActivityList pos={"user"} />
                             </Tabs.TabPane>
-                            <Tabs.TabPane tab="Data Diri" key="2"><FormData /></Tabs.TabPane>
                             <Tabs.TabPane tab="Barang Lelang Yang Dimenangkan" key="3">
                                 <ActivityList pos={"lelang"} />
                             </Tabs.TabPane>
@@ -222,37 +394,81 @@ export default class UserProfile extends PureComponent {
             );
         }
     }
+    handleUpload = () => {
+        const { upload } = this.state;
+        //handling upload
+    }
+
+
 
     render() {
-        console.log(this.state.width);
+        const { uploading, upload } = this.state;
 
+        const props = {
+            onRemove: (file) => {
+                this.setState((state) => {
+                    upload: undefined
+                });
+            },
+            beforeUpload: (file) => {
+                this.setState(state => ({
+                    upload: [file],
+                }));
+                return false;
+            },
+            upload,
+        };
+        if (localStorage.token) {
+            return (
+                <Row gutter={24}>
+                    <Col
+
+                        xl={{ span: 8 }}
+                        xxl={{ span: 6 }}
+                        style={{ textAlign: 'center' }}
+                    >
+                        <Card style={{ borderRadius: 8, boxShadow: "rgba(0, 0, 0, 0.12) 0px 2px 8px 0px" }}>
+                            <Skeleton loading={this.state.getData} active avatar={{ size: "large" }} paragraph={false} title={false} >
+                                <Avatar size={200} src={this.state.foto} />
+
+
+                            </Skeleton>
+                            <Skeleton loading={this.state.getData} active paragraph={false}>
+                                <h3 style={{ marginTop: 10 }}>{this.state.nama}</h3>
+
+                            </Skeleton>
+                            <Skeleton loading={this.state.getData} active paragraph={false}>
+                                <Upload {...props}>
+                                    <Button>
+                                        <Icon type="upload" /> Pilih Avatar
+                                  </Button>
+                                </Upload>
+                                <Button
+                                    type="primary"
+                                    onClick={this.handleUpload}
+                                    disabled={this.state.upload === undefined}
+                                    loading={this.state.uploading}
+                                    style={{ marginTop: 16 }}
+                                >
+                                    {this.state.uploading ? 'Upload Foto...' : 'Upload Foto'}
+                                </Button>
+
+                            </Skeleton>
+
+                        </Card>
+                    </Col>
+                    <Col
+
+                        xl={{ span: 16 }}
+                        xxl={{ span: 18 }}
+                    >
+                        {this.renderTab()}
+                    </Col>
+                </Row>
+            );
+        }
         return (
-            <Row gutter={24}>
-                <Col
-                    // xs={{ span: 24 }}
-                    // sm={{ span: 8 }}
-                    // md={{ span: 12 }}
-                    // lg={{ span: 4}}
-                    xl={{ span: 8 }}
-                    xxl={{ span: 6 }}
-                    style={{ textAlign: 'center' }}
-                >
-                    <Card style={{ borderRadius: 8, boxShadow: "rgba(0, 0, 0, 0.12) 0px 2px 8px 0px" }}>
-                        <Avatar size={200} src="https://cdn1.i-scmp.com/sites/default/files/styles/1200x800/public/images/methode/2018/07/26/bf01d32e-8fcd-11e8-ad1d-4615aa6bc452_1280x720_204951.jpg?itok=NjQWdY8Z" />
-                        <h3 style={{ marginTop: 10 }}>Lisa</h3>
-                    </Card>
-                </Col>
-                <Col
-                    // xs={{ span: 24 }}
-                    // sm={{ span: 8 }}
-                    // md={{ span: 12 }}
-                    // lg={{ span: 20 }}
-                    xl={{ span: 16 }}
-                    xxl={{ span: 18 }}
-                >
-                    {this.renderTab()}
-                </Col>
-            </Row>
-        );
+            <h1>Please Login </h1>
+        )
     }
 }

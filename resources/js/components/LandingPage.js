@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Carousel, Layout, Row, Col, List, Card, Divider, Menu } from 'antd';
-
+import { Link } from 'react-router-dom';
 import './css/landing.css';
 const data = [
     {
@@ -80,17 +80,19 @@ export default class LandingPage extends Component {
                         }}
                         dataSource={this.state.hotItem}
                         renderItem={item => (
-                            <List.Item>
-                                <Card
-                                    hoverable
-                                    cover={<img alt="example" src={item.image} />}
-                                >
-                                    <Card.Meta
-                                        title={item.title}
-                                        description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
-                                    />
-                                </Card>
-                            </List.Item>
+                            <Link to={'/itemDetails#' + item.id}>
+                                <List.Item>
+                                    <Card
+                                        hoverable
+                                        cover={<img alt="example" src={item.image} />}
+                                    >
+                                        <Card.Meta
+                                            title={item.title}
+                                            description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
+                                        />
+                                    </Card>
+                                </List.Item>
+                            </Link>
                         )}
                     />
                     <Divider orientation="left">Rekomendasi</Divider>
@@ -100,17 +102,19 @@ export default class LandingPage extends Component {
                         }}
                         dataSource={this.state.rekomItem}
                         renderItem={item => (
-                            <List.Item>
-                                <Card
-                                    hoverable
-                                    cover={<img alt="example" src={item.image} />}
-                                >
-                                    <Card.Meta
-                                        title={item.title}
-                                        description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
-                                    />
-                                </Card>
-                            </List.Item>
+                            <Link to={'/itemDetails#' + item.id}>
+                                <List.Item>
+                                    <Card
+                                        hoverable
+                                        cover={<img alt="example" src={item.image} />}
+                                    >
+                                        <Card.Meta
+                                            title={item.title}
+                                            description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
+                                        />
+                                    </Card>
+                                </List.Item>
+                            </Link>
                         )}
                     />
                 </Menu>
