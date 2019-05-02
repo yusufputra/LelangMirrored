@@ -282,7 +282,7 @@ export default class ItemDetails extends Component {
         // let d = new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5]));
         let startDate = Date.parse(start);
         let finishDate = Date.parse(finish);
-        console.log(this.state.load +""+ (startDate <= Date.now()) +""+ (finishDate >= Date.now()));
+        console.log(this.state.load +" "+ startDate +" "+ Date.now()) +" "+ (finishDate >= Date.now());
         return (
             <Layout>
                 <Breadcrumb separator=">" style={{ padding: "16px 0" }}>
@@ -362,7 +362,7 @@ export default class ItemDetails extends Component {
                                                 addonBefore="Rp"
                                                 enterButton="Tawar Barang"
                                                 size="large"
-                                                disabled={this.state.load ||( (startDate <= Date.now()) && (finishDate >= Date.now()) && !this.state.loggedin)}
+                                                disabled={this.state.load ||( (startDate <= Date.now()) && !(finishDate >= Date.now()) || !this.state.loggedin)}
                                                 onSearch={(value) => this.handleSubmit(value)}
                                             />
                                             {this.state.load && <Spin />}

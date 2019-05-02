@@ -1,4 +1,5 @@
-import React, { PureComponent, Fragment } from 'react'
+import React, { PureComponent, Fragment } from 'react';
+import {Link} from 'react-router-dom';
 import {
     Form, Upload, DatePicker, Icon, Avatar, message, Row, Col, Card, Spin, List, Button, Skeleton, Tabs, Typography, Input,
 } from 'antd';
@@ -109,9 +110,7 @@ class ActivityList extends PureComponent {
                 textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px',
             }}
             >
-                <Button onClick={() => {
-                    window.location.replace('/tambahAlamat');
-                }}>Tambah Alamat</Button>
+
 
             </div>
         ) : null;
@@ -119,50 +118,55 @@ class ActivityList extends PureComponent {
         switch (this.props.pos) {
             case "user":
                 return (
-                    <List
-                        className="demo-loadmore-list"
-                        loading={initLoading}
-                        itemLayout="horizontal"
-                        dataSource={list}
-                        renderItem={item => (
-                            <List.Item actions={[]}>
-                                {console.log(item)}
-                                <Skeleton avatar title={false} loading={item.loading} active>
+                    <div>
+                        <List
+                            className="demo-loadmore-list"
+                            loading={initLoading}
+                            itemLayout="horizontal"
+                            dataSource={list}
+                            renderItem={item => (
+                                <List.Item actions={[]}>
+                                    {console.log(item)}
+                                    <Skeleton avatar title={false} loading={item.loading} active>
 
-                                    <div style={{ paddingTop: 0 }}>
-                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
-                                            <h5>Penerima:</h5>
-                                            <h5  >{item.nama_penerima}</h5>
+                                        <div style={{ paddingTop: 0 }}>
+                                            <div style={{ flexDirection: 'row', display: 'flex' }}>
+                                                <h5>Penerima:</h5>
+                                                <h5  >{item.nama_penerima}</h5>
+                                            </div>
+
+                                            <div style={{ flexDirection: 'row', display: 'flex' }}>
+
+                                                <h5>Jalan:</h5>
+                                                <h5 >{item.nama_jalan}</h5>
+                                            </div>
+
+                                            <div style={{ flexDirection: 'row', display: 'flex' }}>
+
+                                                <h5>Kelurahan:</h5>
+                                                <h5 >{item.kelurahan}</h5>
+                                            </div>
+                                            <div style={{ flexDirection: 'row', display: 'flex' }}>
+
+                                                <h5>Kode Pos:</h5>
+                                                <h5 >{item.kode_pos}</h5>
+                                            </div>
+                                            <div style={{ flexDirection: 'row', display: 'flex' }}>
+
+                                                <h5>Nomor Telepon:</h5>
+                                                <h5 >{item.no_telepon}</h5>
+                                            </div>
+                                            <Button onClick={() => { this.deleteAddres(item.id) }} loading={this.state.loading}>Hapus Alamat</Button>
                                         </div>
+                                    </Skeleton>
 
-                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
-
-                                            <h5>Jalan:</h5>
-                                            <h5 >{item.nama_jalan}</h5>
-                                        </div>
-
-                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
-
-                                            <h5>Kelurahan:</h5>
-                                            <h5 >{item.kelurahan}</h5>
-                                        </div>
-                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
-
-                                            <h5>Kode Pos:</h5>
-                                            <h5 >{item.kode_pos}</h5>
-                                        </div>
-                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
-
-                                            <h5>Nomor Telepon:</h5>
-                                            <h5 >{item.no_telepon}</h5>
-                                        </div>
-                                        <Button onClick={() => { this.deleteAddres(item.id) }} loading={this.state.loading}>Hapus Alamat</Button>
-                                    </div>
-                                </Skeleton>
-
-                            </List.Item>
-                        )}
-                    />);
+                                </List.Item>
+                            )}
+                        />
+                        <Button onClick={() => {
+                            window.location.replace('/tambahAlamat');
+                        }}>Tambah Alamat</Button>
+                    </div>);
             default:
                 return (<List
                     className="demo-loadmore-list"
@@ -174,8 +178,8 @@ class ActivityList extends PureComponent {
                             {console.log(item)}
                             <Skeleton avatar title={false} loading={item.loading} active>
                                 <List.Item.Meta
-                                    avatar={<Avatar src={item.barang.foto[0]}/>}
-                                    title={item.barang.nama_barang}
+                                    avatar={<Avatar src={item.barang.foto[0]} />}
+                                    title={<Link to={'/checkout#'+item.id}>{item.barang.nama_barang}</Link>}
                                     description={`Rp ${item.barang.max_bid.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
                                 />
                             </Skeleton>

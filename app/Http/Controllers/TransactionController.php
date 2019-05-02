@@ -91,7 +91,7 @@ class TransactionController extends Controller
             if ($transaksi) {
                 if ($transaksi->barang->toko->pemilik->username == $request->user->username) {
                     $transaksi->resi = $validatedData['resi'];
-                    $transaksi->status = 2;
+                    $transaksi->status = 4;
                     $transaksi->save();
 
                     return response()->json([
@@ -133,7 +133,7 @@ class TransactionController extends Controller
 
             if ($transaksi) {
                 if ($transaksi->username_pengguna == $request->user->username) {
-                    $transaksi->status = 1;
+                    $transaksi->status = 2;
                     $transaksi->save();
 
                     return response()->json([
@@ -175,7 +175,7 @@ class TransactionController extends Controller
 
             if ($transaksi) {
                 if ($transaksi->username_pengguna == $request->user->username) {
-                    $transaksi->status = 3;
+                    $transaksi->status = 5;
                     $transaksi->save();
 
                     return response()->json([
@@ -207,6 +207,61 @@ class TransactionController extends Controller
                 $errorData['message'] = 'Terjadi kesalahan pada server';
             }
             return response()->json($errorData, 500);
+        }
+    }
+
+    public function storeShipmentAddress(Request $request, $id)
+    {
+        try {
+            $validatedData = $request->validate([
+                'id_alamat_pengiriman' => 'required|min:0|numeric',
+            ]);
+
+            $transaksi = Transaksi::find($id);
+
+            if ($transaksi) {
+                if ($transaksi->username_pengguna == $request->user->username) {
+                    $transaksi->id_alamat_pengiriman = $validatedData['id_alamat_pengiriman'];
+                    $transaksi->status = 1;
+                    $transaksi->save();
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Nomor resi berhasil dimasukkan',
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Anda tidak memiliki izin',
+                    ], 403);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan',
+                ], 404);
+            }
+        } catch (\Exception $e) {
+            $errorData = ['status' => false];
+
+            if (empty($e->status)) {
+                if (isset($e->errorInfo[1])) {
+                    switch ($e->errorInfo[1]) {
+                        case 1216:
+                            $errorData['message'] = 'Alamat pengiriman tidak valid';
+                            break;
+                        default:
+                            $errorData['message'] = 'Terjadi kesalahan pada database';
+                            break;
+                    }
+                } else {
+                    $errorData['message'] = 'Terjadi kesalahan pada server';
+                }
+            } else {
+                $errorData['message'] = 'Input data tidak valid';
+            }
+
+            return response()->json($errorData, $e->status ?? 500);
         }
     }
 }

@@ -37,6 +37,7 @@ class Kernel extends ConsoleKernel
             foreach ($barangLelang as $barang) {
 
                 $time_diff = $timeExecuted - strtotime($barang->waktu_akhir);
+                error_log($time_diff);
                 if ($time_diff > 0 && $time_diff <= 60) {
                     $penawaranMenang = $barang->penawaran[count($barang->penawaran) - 1];
                     error_log($penawaranMenang);
