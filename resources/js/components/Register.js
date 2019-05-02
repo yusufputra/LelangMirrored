@@ -2,6 +2,7 @@ import React, { PureComponent, Fragment } from 'react'
 import {
   Form, Input, Tooltip, Icon, DatePicker, Select, Row, Col, Checkbox, Button, AutoComplete, Menu, Alert
 } from 'antd';
+import { Redirect } from 'react-router-dom'
 import api from './api';
 
 
@@ -156,65 +157,6 @@ class RegistrationForm extends PureComponent {
               <Input type="password" onBlur={this.handleConfirmBlur} />
             )}
           </Form.Item>
-          {/* <Form.Item
-          colon={false}
-          label={(
-            <span style={{ fontSize: 20 }}>
-              Nama Toko :
-              <Tooltip title="Nama toko dapat diatur kembali nanti">
-                <Icon type="question-circle-o" />
-              </Tooltip>
-            </span>
-          )}
-          style={{ marginBottom: '0px' }}
-        >
-          {getFieldDecorator('nickname', {
-            rules: [{ required: false, whitespace: true }],
-          })(
-            <Input />
-          )}
-        </Form.Item> */}
-          {/* <Form.Item
-          colon={false}
-          label={(
-            <span style={{ fontSize: 20 }}>Alamat :</span>
-          )}
-          style={{ marginBottom: '0px' }}
-        >
-          {getFieldDecorator('address', {
-            rules: [{ type: 'string', required: true, message: 'Mohon isi alamat anda!' }],
-          })(
-            <Input placeholder={"Masukkan Alamat Anda"} >
-
-            </Input>
-          )}
-        </Form.Item> */}
-          {/* <Form.Item
-          colon={false}
-          style={{ marginBottom: '0px' }}
-          label={(
-            <span style={{ fontSize: 20 }}>Kode Pos :</span>
-          )}        >
-          {getFieldDecorator('zipcode', {
-            rules: [{ type: 'string', required: true, message: 'Mohon isi kodepos anda!' }],
-          })(
-            <Input placeholder={"Masukkan Alamat Anda"} >
-
-            </Input>
-          )}
-        </Form.Item>
-        <Form.Item
-          colon={false}
-          style={{ marginBottom: '0px' }}
-          label={(
-            <span style={{ fontSize: 20 }}>Nomor Telepon :</span>
-          )}        >
-          {getFieldDecorator('phone', {
-            rules: [{ required: true, message: 'Please input your phone number!' }],
-          })(
-            <Input addonBefore={"+62"} style={{ width: '100%' }} />
-          )}
-        </Form.Item> */}
           <Form.Item
             colon={false}
             style={{ marginBottom: '0px' }}
@@ -242,6 +184,11 @@ const WrappedRegistrationForm = Form.create({ name: 'register' })(RegistrationFo
 
 export default class Register extends PureComponent {
   render() {
+    if (localStorage.token) {
+      return (
+        <Redirect to='/profile'></Redirect>
+      )
+    }
     return (
       <Menu style={{ width: '40%', margin: 'auto', padding: 16, borderRadius: 10 }}>
         <h3 style={{ textAlign: 'center' }}>Daftar akun baru sekarang</h3>

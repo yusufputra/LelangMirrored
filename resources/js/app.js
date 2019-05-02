@@ -25,7 +25,7 @@ import ReactModal from 'react-modal';
 import Example from './components/Example';
 import Search from './components/Search';
 import ShopDetail from './components/ShopDetail';
-
+import WrappedTambahAlamat from './components/AddAddress';
 import 'antd/dist/antd.css';  // or 'antd/dist/antd.less'
 import styles from './app.css';
 import './app.css';
@@ -318,6 +318,7 @@ class AppChildren extends PureComponent {
 								<Route path='/checkout' component={Checkout} />
 								<Route path='/search' component={Search} />
 								<Route path='/shop' component={ShopDetail} />
+								<Route path='/tambahAlamat' component={WrappedTambahAlamat} />
 								<Route path='/register' component={Register} />
 								<Route path='/profile' component={UserProfile} />
 								<Route path='/createShop' component={CreateShop} />

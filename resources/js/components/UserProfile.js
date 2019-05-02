@@ -1,14 +1,21 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Fragment } from 'react'
 import {
-    Form, Upload, DatePicker, Icon, Avatar, message, Row, Col, Card, Spin, List, Button, Skeleton, Tabs, Typography
+    Form, Upload, DatePicker, Icon, Avatar, message, Row, Col, Card, Spin, List, Button, Skeleton, Tabs, Typography, Input,
 } from 'antd';
 const count = 3;
 const fakeDataUrl = `https://randomuser.me/api/?results=${count}&inc=name,gender,email,nat&noinfo`;
 const { Paragraph } = Typography;
 import UserProvider, { UserContext } from '../contexts/UserProvider';
 import ReactModal from 'react-modal';
+import { Redirect } from 'react-router';
 import axios from 'axios';
 // prepare for activity list if you want.
+
+
+
+
+
+
 
 class ActivityList extends PureComponent {
     state = {
@@ -16,23 +23,27 @@ class ActivityList extends PureComponent {
         loading: false,
         data: [],
         list: [],
+        visible: false
+    }
+
+    handleCancel = (e) => {
+        this.setState({
+            visible: false,
+        });
+    }
+
+    handleOk = (e) => {
+        //login process here
+        this.setState({
+            visible: false,
+        });
     }
 
     componentDidMount() {
         this.getData();
     }
 
-    // getData = (callback) => {
-    //     reqwest({
-    //         url: fakeDataUrl,
-    //         type: 'json',
-    //         method: 'get',
-    //         contentType: 'application/json',
-    //         success: (res) => {
-    //             callback(res);
-    //         },
-    //     });
-    // }
+
 
     async getData() {
         const token = localStorage.token;
@@ -42,7 +53,8 @@ class ActivityList extends PureComponent {
         this.setState({
             initLoading: false,
             data: data.data.data,
-            list: data.data.data
+            list: data.data.data,
+            loading:false,
         })
         return (data);
     }
@@ -67,6 +79,17 @@ class ActivityList extends PureComponent {
     //     });
     // }
 
+    deleteAddres = async (id) => {
+        try {            
+            this.setState({loading:true});
+            const data = await axios.post('/api/ubah-alamat-pengiriman/'+id, {id:id},{ headers: { Authorization: localStorage.token } });
+            console.log(data);
+            this.setState({loading:false});
+        }
+        catch (err) {
+            console.log(err);
+        }
+    }
     render() {
         const { initLoading, loading, list } = this.state;
         const loadMore = !initLoading && !loading ? (
@@ -74,7 +97,10 @@ class ActivityList extends PureComponent {
                 textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px',
             }}
             >
-                <Button onClick={this.onLoadMore}>Tambah Alamat</Button>
+                <Button onClick={() => {
+                    window.location.replace('/tambahAlamat');
+                }}>Tambah Alamat</Button>
+
             </div>
         ) : null;
 
@@ -91,14 +117,38 @@ class ActivityList extends PureComponent {
                             <List.Item actions={[]}>
                                 {console.log(item)}
                                 <Skeleton avatar title={false} loading={item.loading} active>
-                                    <List.Item.Meta
 
-                                        avatar={<Avatar src="https://cdn1.i-scmp.com/sites/default/files/styles/1200x800/public/images/methode/2018/07/26/bf01d32e-8fcd-11e8-ad1d-4615aa6bc452_1280x720_204951.jpg?itok=NjQWdY8Z" />}
-                                        title={"Lisa"}
-                                        description="Melakukan Penawaran Terhadap Barang Mobil Impian sebesar Rp. 100.000.000"
-                                    />
+                                    <div style={{ paddingTop: 0 }}>
+                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
+                                            <h5>Penerima:</h5>
+                                            <h5  >{item.nama_penerima}</h5>
+                                        </div>
 
+                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
+
+                                            <h5>Jalan:</h5>
+                                            <h5 >{item.nama_jalan}</h5>
+                                        </div>
+
+                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
+
+                                            <h5>Kelurahan:</h5>
+                                            <h5 >{item.kelurahan}</h5>
+                                        </div>
+                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
+
+                                            <h5>Kode Pos:</h5>
+                                            <h5 >{item.kode_pos}</h5>
+                                        </div>
+                                        <div style={{ flexDirection: 'row', display: 'flex' }}>
+
+                                            <h5>Nomor Telepon:</h5>
+                                            <h5 >{item.no_telepon}</h5>
+                                        </div>
+                                        <Button onClick={()=>{this.deleteAddres(item.id)}}>Hapus Alamat</Button>
+                                    </div>
                                 </Skeleton>
+
                             </List.Item>
                         )}
                     />);
@@ -160,7 +210,7 @@ class FormData extends PureComponent {
             foto: data.data.data.foto,
             getData: false,
             visible: false,
-            loading:false,
+            loading: false,
         });
     }
 
@@ -170,7 +220,7 @@ class FormData extends PureComponent {
 
     sendData = async () => {
         this.setState({
-            loading:true
+            loading: true
         })
         const body = {
             nama: this.state.nama,
@@ -178,15 +228,15 @@ class FormData extends PureComponent {
             tanggal_lahir: this.state.tanggal_lahir
         }
         const data = await axios.post('/api/perbarui-profil', body, { headers: { Authorization: localStorage.token } });
-        if (data.status === 200){
+        if (data.status === 200) {
             this.setState({
-                loading:false
+                loading: false
             })
             message.success(`Profile Updated`);
         }
         else {
             this.setState({
-                loading:false
+                loading: false
             })
             message.error(`Update Gagal`);
 
