@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Carousel, Layout, Row, Col, List, Card, Divider, Menu } from 'antd';
+import { Carousel, Layout, Row, Spin, List, Card, Divider, Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import './css/landing.css';
 
@@ -8,12 +8,12 @@ export default class LandingPage extends Component {
 		super(props);
 		this.state = {
 			hotItem: [],
-			rekomItem: []
+			rekomItem: [],
+			loading:true,
 		}
 	}
 
 	componentWillMount() {
-        ///api/cari-barang-lelang?sortBy=popularity&perPage=10
 		axios.get('/api/hotItem')
 			.then(ress => {
 				console.log(ress.data)
@@ -41,11 +41,21 @@ export default class LandingPage extends Component {
 						image: (element.foto.length == 0) ? "http://sifatit.com/wp-content/uploads/2012/07/dummy-500x337.jpg" : element.foto[0]
 					})
 				}
+				this.setState({loading:false});
 				this.setState({ rekomItem: data });
 			})
 	}
 
+
+
 	render() {
+		if (this.state.loading){
+			return (
+				<div style={{textAlign:'center'}}>
+				<Spin/>
+				</div>
+			)
+		}
 		return (
 			<Layout>
 				<Row style={{ marginBottom: '20px' }}>
