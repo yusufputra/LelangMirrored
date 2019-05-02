@@ -9,7 +9,7 @@ export default class LandingPage extends Component {
 		this.state = {
 			hotItem: [],
 			rekomItem: [],
-			loading:true,
+			loading: true,
 		}
 	}
 
@@ -41,7 +41,7 @@ export default class LandingPage extends Component {
 						image: (element.foto.length == 0) ? "http://sifatit.com/wp-content/uploads/2012/07/dummy-500x337.jpg" : element.foto[0]
 					})
 				}
-				this.setState({loading:false});
+				this.setState({ loading: false });
 				this.setState({ rekomItem: data });
 			})
 	}
@@ -49,10 +49,10 @@ export default class LandingPage extends Component {
 
 
 	render() {
-		if (this.state.loading){
+		if (this.state.loading) {
 			return (
-				<div style={{textAlign:'center'}}>
-				<Spin/>
+				<div style={{ textAlign: 'center' }}>
+					<Spin />
 				</div>
 			)
 		}
@@ -82,7 +82,11 @@ export default class LandingPage extends Component {
 									>
 										<Card.Meta
 											title={item.title}
-											description={`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
+											description={
+												<p style={{ color: 'orange' }}>
+													{`Rp ${item.latestBidPrice.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}`}
+												</p>
+											}
 										/>
 									</Card>
 								</List.Item>

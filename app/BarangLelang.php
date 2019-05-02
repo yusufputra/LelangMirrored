@@ -52,6 +52,10 @@ class BarangLelang extends Model
             $foto[] = url($standardPhotoPath . end($photo_name));
         }
 
+        if(!$foto) {
+            $foto[] = "http://sifatit.com/wp-content/uploads/2012/07/dummy-500x337.jpg";
+        }
+
         return $foto;
     }
 
