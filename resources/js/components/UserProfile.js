@@ -82,7 +82,7 @@ class ActivityList extends PureComponent {
     deleteAddres = async (id) => {
         try {            
             this.setState({loading:true});
-            const data = await axios.post('/api/ubah-alamat-pengiriman/'+id, {id:id},{ headers: { Authorization: localStorage.token } });
+            const data = await axios.post('/api/ubah-alamat-pengiriman/'+id, {},{ headers: { Authorization: localStorage.token } });
             console.log(data);
             this.setState({loading:false});
         }
@@ -90,7 +90,7 @@ class ActivityList extends PureComponent {
             console.log(err);
         }
     }
-    render() {
+    render() {  
         const { initLoading, loading, list } = this.state;
         const loadMore = !initLoading && !loading ? (
             <div style={{

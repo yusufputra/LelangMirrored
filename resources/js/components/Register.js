@@ -1,6 +1,6 @@
 import React, { PureComponent, Fragment } from 'react'
 import {
-  Form, Input, Tooltip, Icon, DatePicker, Select, Row, Col, Checkbox, Button, AutoComplete, Menu, Alert
+  Form, Input, message, Icon, DatePicker, Select, Row, Col, Checkbox, Button, AutoComplete, Menu, Alert
 } from 'antd';
 import { Redirect } from 'react-router-dom'
 import api from './api';
@@ -11,10 +11,12 @@ class RegistrationForm extends PureComponent {
     confirmDirty: false,
     autoCompleteResult: [],
     datePicker: null,
-    status: false
+    status: false,
+    loading: false,
   };
 
   handleSubmit = (e) => {
+    this.setState({ loading: true });
     e.preventDefault();
     this.props.form.validateFieldsAndScroll(async (err, values) => {
       if (!err) {
@@ -26,12 +28,14 @@ class RegistrationForm extends PureComponent {
           password: values.password,
           tanggal_lahir: this.state.datePicker
         }
-        console.log(body);
         try {
           const status = await axios.post(api.register, body);
+          this.setState({ loading: false });
+          message.success(`Register Berhasil`);
           console.log(status.data);
         }
         catch (err) {
+          this.setState({ loading: false });
           console.log('error');
           console.log(err);
           this.setState({ status: true });
@@ -172,7 +176,7 @@ class RegistrationForm extends PureComponent {
 
           <Form.Item
             style={{ marginBottom: '0px' }} >
-            <Button block type="primary" htmlType="submit">Register</Button>
+            <Button block type="primary" htmlType="submit" loading={this.state.loading}>Register</Button>
           </Form.Item>
         </Form>
       </Fragment>
